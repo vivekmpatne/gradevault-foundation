@@ -14,6 +14,7 @@ import {
   Gauge,
   Compass,
   MessageSquare,
+  Code2,
 } from "lucide-react";
 import {
   Sidebar,
