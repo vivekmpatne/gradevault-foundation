@@ -15,6 +15,7 @@ import {
   Compass,
   MessageSquare,
   Code2,
+  Upload,
 } from "lucide-react";
 import {
   Sidebar,
