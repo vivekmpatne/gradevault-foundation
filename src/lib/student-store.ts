@@ -173,23 +173,3 @@ export type {
   PrepTrack,
   ThemeMode,
 } from "@/lib/settings-store";
-
-}
-
-// Re-exports so consumers only need this one module.
-export { useAcademicData } from "@/lib/academic-store";
-export {
-  useSettings,
-  saveSettings,
-  setTheme,
-  loadSettings,
-  loadTheme,
-  applyTheme,
-  DEFAULT_SETTINGS,
-} from "@/lib/settings-store";
-export type { AcademicData } from "@/lib/academic-store";
-export type {
-  StudentSettings,
-  PrepTrack,
-  ThemeMode,
-} from "@/lib/settings-store";
