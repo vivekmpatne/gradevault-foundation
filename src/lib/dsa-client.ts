@@ -62,71 +62,34 @@ export async function fetchLeetCode(username: string): Promise<LeetCodeStats> {
   const clean = username.trim().replace(/^@/, "");
   if (!clean) throw new Error("LeetCode username is required");
 
-  // Stats proxy (community). Returns { status, totalSolved, easySolved, ... }
-  const statsRes = await fetch(
-    `https://leetcode-stats-api.herokuapp.com/${encodeURIComponent(clean)}`,
-  );
-  if (!statsRes.ok)
-    throw new Error(`LeetCode stats failed (${statsRes.status})`);
-  const stats = (await statsRes.json()) as {
-    status?: string;
-    message?: string;
-    totalSolved?: number;
-    easySolved?: number;
-    mediumSolved?: number;
-    hardSolved?: number;
-    ranking?: number;
-  };
-  if (stats.status && stats.status !== "success")
-    throw new Error(stats.message || "LeetCode user not found");
-
-  // Contest data (best-effort; the alfa proxy is sometimes cold/down).
-  let contestRating: number | null = null;
-  let contestCount: number | null = null;
-  let history: LeetCodeStats["history"] = [];
+  // Use our server function so we bypass LeetCode's CORS restriction
+  // (the previous community proxy at leetcode-stats-api.herokuapp.com is
+  // frequently down and was the source of the "Failed to fetch" badge).
+  const { fetchLeetCodeStats } = await import("./leetcode.functions");
+  let server;
   try {
-    const cRes = await fetch(
-      `https://alfa-leetcode-api.onrender.com/${encodeURIComponent(clean)}/contest`,
+    server = await fetchLeetCodeStats({ data: { username: clean } });
+  } catch (e) {
+    throw new Error(
+      (e as Error)?.message?.replace(/^Error:\s*/, "") ||
+        "LeetCode lookup failed",
     );
-    if (cRes.ok) {
-      const c = (await cRes.json()) as {
-        contestRating?: number;
-        contestAttend?: number;
-      };
-      if (typeof c.contestRating === "number")
-        contestRating = Math.round(c.contestRating);
-      if (typeof c.contestAttend === "number") contestCount = c.contestAttend;
-    }
-    const hRes = await fetch(
-      `https://alfa-leetcode-api.onrender.com/${encodeURIComponent(clean)}/contest/history`,
-    );
-    if (hRes.ok) {
-      const h = (await hRes.json()) as {
-        contestHistory?: { contest?: { title?: string }; rating?: number; attended?: boolean }[];
-      };
-      history =
-        h.contestHistory
-          ?.filter((x) => x.attended && typeof x.rating === "number")
-          .map((x) => ({
-            contest: x.contest?.title ?? "Contest",
-            rating: Math.round(x.rating!),
-          })) ?? [];
-    }
-  } catch {
-    // Non-fatal — leave contest fields null.
   }
 
   const out: LeetCodeStats = {
-    username: clean,
+    username: server.username,
     fetchedAt: Date.now(),
-    totalSolved: stats.totalSolved ?? 0,
-    easySolved: stats.easySolved ?? 0,
-    mediumSolved: stats.mediumSolved ?? 0,
-    hardSolved: stats.hardSolved ?? 0,
-    ranking: stats.ranking ?? 0,
-    contestRating,
-    contestCount,
-    history,
+    totalSolved: server.totalSolved,
+    easySolved: server.easySolved,
+    mediumSolved: server.mediumSolved,
+    hardSolved: server.hardSolved,
+    ranking: server.ranking,
+    contestRating: server.contestRating,
+    contestCount: server.contestCount,
+    history: server.history
+      .slice()
+      .sort((a, b) => a.attendedAt - b.attendedAt)
+      .map((h) => ({ contest: h.contest, rating: h.rating })),
   };
   localStorage.setItem(lcKey(clean), JSON.stringify(out));
   return out;
