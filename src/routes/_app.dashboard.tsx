@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { DashboardSkeleton } from "@/components/dashboard-skeleton";
 import {
   GraduationCap,
   TrendingUp,
@@ -71,12 +72,16 @@ function DashboardPage() {
   const navigate = useNavigate();
   const data = useAcademicData();
   const { settings } = useSettings();
+  const [bootstrapped, setBootstrapped] = useState(false);
 
   useEffect(() => {
     if (!data.student) navigate({ to: "/" });
+    const t = setTimeout(() => setBootstrapped(true), 250);
+    return () => clearTimeout(t);
   }, [data.student, navigate]);
 
   if (!data.student) return null;
+  if (!bootstrapped) return <DashboardSkeleton />;
 
   const {
     student,

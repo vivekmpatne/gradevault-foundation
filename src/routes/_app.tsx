@@ -29,11 +29,11 @@ function AppLayout() {
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0">
-          <header className="h-14 flex items-center gap-3 border-b px-4 sticky top-0 bg-background/80 backdrop-blur z-10">
+          <header className="h-14 flex items-center gap-3 border-b px-3 sm:px-4 sticky top-0 bg-background/80 backdrop-blur z-10">
             <SidebarTrigger />
-            <span className="text-sm font-medium text-muted-foreground">GradeVault</span>
+            <span className="text-sm font-medium text-muted-foreground truncate">GradeVault</span>
           </header>
-          <main className="flex-1 p-6">
+          <main className="flex-1 p-3 sm:p-6">
             <Outlet />
           </main>
         </div>
