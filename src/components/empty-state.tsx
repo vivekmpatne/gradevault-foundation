@@ -2,7 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import { Inbox } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type EmptyStateProps = {
+export type EmptyStateProps = {
   icon?: LucideIcon;
   title: string;
   description?: string;

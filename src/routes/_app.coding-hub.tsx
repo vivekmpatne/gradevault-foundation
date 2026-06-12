@@ -277,26 +277,31 @@ function CodingHubPage() {
             label="Total Problems Solved"
             value={settings.totalProblemsSolved}
             onCommit={(v) => update("totalProblemsSolved", v)}
+            max={10_000}
           />
           <NumField
             label="LeetCode Rating"
             value={settings.leetcode}
             onCommit={(v) => update("leetcode", v)}
+            max={4000}
           />
           <NumField
             label="Codeforces Rating"
             value={settings.codeforces}
             onCommit={(v) => update("codeforces", v)}
+            max={4500}
           />
           <NumField
             label="Contest Count"
             value={settings.contestCount}
             onCommit={(v) => update("contestCount", v)}
+            max={2000}
           />
           <NumField
             label="Current Streak (days)"
             value={settings.currentStreak}
             onCommit={(v) => update("currentStreak", v)}
+            max={3650}
           />
         </CardContent>
       </Card>
@@ -314,21 +319,25 @@ function CodingHubPage() {
             label="Projects Built"
             value={settings.projects}
             onCommit={(v) => update("projects", v)}
+            max={200}
           />
           <NumField
             label="GitHub Repositories"
             value={settings.githubRepos}
             onCommit={(v) => update("githubRepos", v)}
+            max={2000}
           />
           <NumField
             label="Open-Source Contributions"
             value={settings.openSourceContributions}
             onCommit={(v) => update("openSourceContributions", v)}
+            max={2000}
           />
           <NumField
             label="Active Development Days"
             value={settings.activeDevDays}
             onCommit={(v) => update("activeDevDays", v)}
+            max={3650}
           />
         </CardContent>
       </Card>
@@ -442,21 +451,27 @@ function NumField({
   label,
   value,
   onCommit,
+  min = 0,
+  max = 100_000,
 }: {
   label: string;
   value: number;
   onCommit: (v: number) => void;
+  min?: number;
+  max?: number;
 }) {
   return (
     <div className="space-y-1.5">
       <Label>{label}</Label>
       <Input
         type="number"
-        min={0}
+        min={min}
+        max={max}
+        step={1}
         defaultValue={value}
         onBlur={(e) => {
           const n = parseInt(e.target.value, 10);
-          const safe = Number.isFinite(n) && n >= 0 ? n : 0;
+          const safe = Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : min;
           if (safe !== value) {
             onCommit(safe);
             toast.success(`${label} saved`);
