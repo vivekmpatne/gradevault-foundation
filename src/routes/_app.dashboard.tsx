@@ -11,6 +11,9 @@ import {
   IdCard,
   LineChart as LineChartIcon,
   Calculator as CalculatorIcon,
+  ArrowUpRight,
+  ArrowDownRight,
+  ArrowRight,
 } from "lucide-react";
 import {
   Card,
@@ -35,7 +38,14 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
-import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
+import {
+  CartesianGrid,
+  LabelList,
+  Line,
+  LineChart,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { useAcademicData } from "@/lib/academic-store";
 
 export const Route = createFileRoute("/_app/dashboard")({
@@ -43,11 +53,16 @@ export const Route = createFileRoute("/_app/dashboard")({
 });
 
 const chartConfig = {
-  sgpa: {
-    label: "SGPA",
-    color: "hsl(var(--primary))",
-  },
+  sgpa: { label: "SGPA", color: "hsl(var(--primary))" },
+  projected: { label: "Projection", color: "hsl(var(--muted-foreground))" },
 } satisfies ChartConfig;
+
+function sgpaColor(v: number): string {
+  if (v >= 9) return "#10B981";
+  if (v >= 8) return "#2563EB";
+  if (v >= 7) return "#F59E0B";
+  return "#EF4444";
+}
 
 function DashboardPage() {
   const navigate = useNavigate();
