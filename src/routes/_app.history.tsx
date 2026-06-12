@@ -41,6 +41,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { deleteSemester, useAcademicData } from "@/lib/academic-store";
+import { EmptyState } from "@/components/empty-state";
 import { gradePointFromMarks } from "@/lib/calculator-storage";
 
 export const Route = createFileRoute("/_app/history")({
