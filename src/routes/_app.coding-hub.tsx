@@ -27,11 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import {
-  loadSettings,
-  saveSettings,
-  useSettings,
-} from "@/lib/settings-store";
+import { useStudent, updateSettings } from "@/lib/student-store";
 import { cn } from "@/lib/utils";
 import { GithubIntegrationPanel } from "@/components/github-integration-panel";
 import { DsaAnalyticsPanel } from "@/components/dsa-analytics-panel";
@@ -41,14 +37,13 @@ export const Route = createFileRoute("/_app/coding-hub")({
 });
 
 function CodingHubPage() {
-  const { settings } = useSettings();
+  const { settings } = useStudent();
 
   const update = <K extends keyof typeof settings>(
     key: K,
     value: (typeof settings)[K],
   ) => {
-    const next = { ...loadSettings(), [key]: value };
-    saveSettings(next);
+    updateSettings({ [key]: value } as Partial<typeof settings>);
   };
 
   const linkedAccounts = useMemo(() => {
