@@ -1,6 +1,92 @@
 [
-  { "name": "Vivek Patne", "usn": "1RN24CD112" },
-  { "name": "Demo Student", "usn": "1RN24CS001" },
-  { "name": "Aditya Kumar", "usn": "1RN24CS045" },
-  { "name": "Priya Singh", "usn": "1RN24IS078" }
+  {
+    "profile": {
+      "name": "Vivek Patne",
+      "usn": "1RN24CD112",
+      "branch": "Computer Science & Design",
+      "currentSemester": 4
+    },
+    "semesters": [
+      { "number": 1, "sgpa": 8.6, "credits": 24, "subjects": [
+        { "code": "MA101", "name": "Mathematics I", "credits": 4, "grade": "A" },
+        { "code": "PH102", "name": "Physics", "credits": 4, "grade": "A+" },
+        { "code": "CS103", "name": "Intro to Programming", "credits": 4, "grade": "A+" }
+      ]},
+      { "number": 2, "sgpa": 8.8, "credits": 24, "subjects": [
+        { "code": "MA201", "name": "Mathematics II", "credits": 4, "grade": "A+" },
+        { "code": "CS202", "name": "Data Structures", "credits": 4, "grade": "A+" },
+        { "code": "EC203", "name": "Basic Electronics", "credits": 3, "grade": "A" }
+      ]},
+      { "number": 3, "sgpa": 9.1, "credits": 25, "subjects": [
+        { "code": "CS301", "name": "OOP with Java", "credits": 4, "grade": "A+" },
+        { "code": "CS302", "name": "Discrete Math", "credits": 4, "grade": "A+" },
+        { "code": "CD303", "name": "Design Thinking", "credits": 3, "grade": "O" }
+      ]}
+    ]
+  },
+  {
+    "profile": {
+      "name": "Demo Student",
+      "usn": "1RN24CS001",
+      "branch": "Computer Science & Engineering",
+      "currentSemester": 3
+    },
+    "semesters": [
+      { "number": 1, "sgpa": 7.8, "credits": 24, "subjects": [
+        { "code": "MA101", "name": "Mathematics I", "credits": 4, "grade": "B+" },
+        { "code": "PH102", "name": "Physics", "credits": 4, "grade": "A" }
+      ]},
+      { "number": 2, "sgpa": 8.2, "credits": 24, "subjects": [
+        { "code": "MA201", "name": "Mathematics II", "credits": 4, "grade": "A" },
+        { "code": "CS202", "name": "Data Structures", "credits": 4, "grade": "A" }
+      ]}
+    ]
+  },
+  {
+    "profile": {
+      "name": "Aditya Kumar",
+      "usn": "1RN24CS045",
+      "branch": "Computer Science & Engineering",
+      "currentSemester": 5
+    },
+    "semesters": [
+      { "number": 1, "sgpa": 7.2, "credits": 24, "subjects": [
+        { "code": "MA101", "name": "Mathematics I", "credits": 4, "grade": "B" }
+      ]},
+      { "number": 2, "sgpa": 7.5, "credits": 24, "subjects": [
+        { "code": "MA201", "name": "Mathematics II", "credits": 4, "grade": "B+" }
+      ]},
+      { "number": 3, "sgpa": 7.9, "credits": 25, "subjects": [
+        { "code": "CS301", "name": "OOP with Java", "credits": 4, "grade": "A" }
+      ]},
+      { "number": 4, "sgpa": 8.1, "credits": 25, "subjects": [
+        { "code": "CS401", "name": "Algorithms", "credits": 4, "grade": "A" }
+      ]}
+    ]
+  },
+  {
+    "profile": {
+      "name": "Priya Singh",
+      "usn": "1RN24IS078",
+      "branch": "Information Science & Engineering",
+      "currentSemester": 6
+    },
+    "semesters": [
+      { "number": 1, "sgpa": 9.0, "credits": 24, "subjects": [
+        { "code": "MA101", "name": "Mathematics I", "credits": 4, "grade": "A+" }
+      ]},
+      { "number": 2, "sgpa": 9.2, "credits": 24, "subjects": [
+        { "code": "MA201", "name": "Mathematics II", "credits": 4, "grade": "A+" }
+      ]},
+      { "number": 3, "sgpa": 9.4, "credits": 25, "subjects": [
+        { "code": "IS301", "name": "Database Systems", "credits": 4, "grade": "O" }
+      ]},
+      { "number": 4, "sgpa": 9.1, "credits": 25, "subjects": [
+        { "code": "IS401", "name": "Operating Systems", "credits": 4, "grade": "A+" }
+      ]},
+      { "number": 5, "sgpa": 9.3, "credits": 25, "subjects": [
+        { "code": "IS501", "name": "Computer Networks", "credits": 4, "grade": "A+" }
+      ]}
+    ]
+  }
 ]
