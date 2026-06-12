@@ -74,14 +74,15 @@ function SettingsPage() {
   const [confirmClear, setConfirmClear] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const usn = student?.profile.usn;
   useEffect(() => {
-    if (!student) {
+    if (!usn) {
       navigate({ to: "/" });
       return;
     }
     setForm(loadSettings());
     setThemeMode(loadTheme());
-  }, [student, navigate]);
+  }, [usn, navigate]);
 
   if (!student || !session) return null;
 
@@ -454,6 +455,7 @@ function ProfileCard() {
     graduationYear: "",
   });
 
+  const usn = student?.profile.usn;
   useEffect(() => {
     if (!student) return;
     setPf({
@@ -466,7 +468,9 @@ function ProfileCard() {
         ? String(student.profile.graduationYear)
         : "",
     });
-  }, [student, editing]);
+    // student object identity changes every render; key effect on usn + editing
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usn, editing]);
 
   if (!student) return null;
 
