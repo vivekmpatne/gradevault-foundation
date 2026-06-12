@@ -1,9 +1,14 @@
 /**
  * LeetCode + Codeforces analytics client.
  * - Codeforces: official public API (CORS-enabled).
- * - LeetCode: community proxies (no official public REST). Handled gracefully on failure.
+ * - LeetCode: server function proxies the official GraphQL endpoint to
+ *   side-step browser CORS and the unreliable community proxies.
  * Results cached in LocalStorage per handle with a 30-min TTL.
  */
+
+import { fetchLeetCodeStats } from "./leetcode.functions";
+
+
 
 export type LeetCodeStats = {
   username: string;
@@ -58,7 +63,6 @@ export function isFresh(s: { fetchedAt: number } | null): boolean {
   return !!s && Date.now() - s.fetchedAt < TTL;
 }
 
-import { fetchLeetCodeStats } from "./leetcode.functions";
 
 export async function fetchLeetCode(username: string): Promise<LeetCodeStats> {
   const clean = username.trim().replace(/^@/, "");
