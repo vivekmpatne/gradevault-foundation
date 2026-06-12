@@ -207,13 +207,21 @@ function DashboardPage() {
             <span>Semester {currentSemester}</span>
           </div>
         </div>
-        <Button
-          onClick={() => exportDashboardPdf(data, settings)}
-          className="shrink-0 gap-2"
-        >
-          <Download className="size-4" />
-          Export PDF
-        </Button>
+        <div className="flex gap-2 shrink-0">
+          <Button asChild variant="outline" className="gap-2">
+            <Link to="/profile-share">
+              <Sparkles className="size-4" />
+              Share Profile
+            </Link>
+          </Button>
+          <Button
+            onClick={() => exportDashboardPdf(data, settings)}
+            className="gap-2"
+          >
+            <Download className="size-4" />
+            Export PDF
+          </Button>
+        </div>
       </div>
 
       <Card>

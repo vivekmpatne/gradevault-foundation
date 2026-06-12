@@ -11,12 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as UUsernameRouteImport } from './routes/u.$username'
 import { Route as AppUploadMarksRouteImport } from './routes/_app.upload-marks'
 import { Route as AppSuggestionsRouteImport } from './routes/_app.suggestions'
 import { Route as AppStrategyRouteImport } from './routes/_app.strategy'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppRoadmapRouteImport } from './routes/_app.roadmap'
 import { Route as AppReadinessRouteImport } from './routes/_app.readiness'
+import { Route as AppProfileShareRouteImport } from './routes/_app.profile-share'
 import { Route as AppPlacementTrackerRouteImport } from './routes/_app.placement-tracker'
 import { Route as AppPlacementRouteImport } from './routes/_app.placement'
 import { Route as AppHistoryRouteImport } from './routes/_app.history'
@@ -32,6 +34,11 @@ const AppRoute = AppRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UUsernameRoute = UUsernameRouteImport.update({
+  id: '/u/$username',
+  path: '/u/$username',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppUploadMarksRoute = AppUploadMarksRouteImport.update({
@@ -62,6 +69,11 @@ const AppRoadmapRoute = AppRoadmapRouteImport.update({
 const AppReadinessRoute = AppReadinessRouteImport.update({
   id: '/readiness',
   path: '/readiness',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProfileShareRoute = AppProfileShareRouteImport.update({
+  id: '/profile-share',
+  path: '/profile-share',
   getParentRoute: () => AppRoute,
 } as any)
 const AppPlacementTrackerRoute = AppPlacementTrackerRouteImport.update({
@@ -109,12 +121,14 @@ export interface FileRoutesByFullPath {
   '/history': typeof AppHistoryRoute
   '/placement': typeof AppPlacementRoute
   '/placement-tracker': typeof AppPlacementTrackerRoute
+  '/profile-share': typeof AppProfileShareRoute
   '/readiness': typeof AppReadinessRoute
   '/roadmap': typeof AppRoadmapRoute
   '/settings': typeof AppSettingsRoute
   '/strategy': typeof AppStrategyRoute
   '/suggestions': typeof AppSuggestionsRoute
   '/upload-marks': typeof AppUploadMarksRoute
+  '/u/$username': typeof UUsernameRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -125,12 +139,14 @@ export interface FileRoutesByTo {
   '/history': typeof AppHistoryRoute
   '/placement': typeof AppPlacementRoute
   '/placement-tracker': typeof AppPlacementTrackerRoute
+  '/profile-share': typeof AppProfileShareRoute
   '/readiness': typeof AppReadinessRoute
   '/roadmap': typeof AppRoadmapRoute
   '/settings': typeof AppSettingsRoute
   '/strategy': typeof AppStrategyRoute
   '/suggestions': typeof AppSuggestionsRoute
   '/upload-marks': typeof AppUploadMarksRoute
+  '/u/$username': typeof UUsernameRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -143,12 +159,14 @@ export interface FileRoutesById {
   '/_app/history': typeof AppHistoryRoute
   '/_app/placement': typeof AppPlacementRoute
   '/_app/placement-tracker': typeof AppPlacementTrackerRoute
+  '/_app/profile-share': typeof AppProfileShareRoute
   '/_app/readiness': typeof AppReadinessRoute
   '/_app/roadmap': typeof AppRoadmapRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/strategy': typeof AppStrategyRoute
   '/_app/suggestions': typeof AppSuggestionsRoute
   '/_app/upload-marks': typeof AppUploadMarksRoute
+  '/u/$username': typeof UUsernameRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -161,12 +179,14 @@ export interface FileRouteTypes {
     | '/history'
     | '/placement'
     | '/placement-tracker'
+    | '/profile-share'
     | '/readiness'
     | '/roadmap'
     | '/settings'
     | '/strategy'
     | '/suggestions'
     | '/upload-marks'
+    | '/u/$username'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -177,12 +197,14 @@ export interface FileRouteTypes {
     | '/history'
     | '/placement'
     | '/placement-tracker'
+    | '/profile-share'
     | '/readiness'
     | '/roadmap'
     | '/settings'
     | '/strategy'
     | '/suggestions'
     | '/upload-marks'
+    | '/u/$username'
   id:
     | '__root__'
     | '/'
@@ -194,17 +216,20 @@ export interface FileRouteTypes {
     | '/_app/history'
     | '/_app/placement'
     | '/_app/placement-tracker'
+    | '/_app/profile-share'
     | '/_app/readiness'
     | '/_app/roadmap'
     | '/_app/settings'
     | '/_app/strategy'
     | '/_app/suggestions'
     | '/_app/upload-marks'
+    | '/u/$username'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
+  UUsernameRoute: typeof UUsernameRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -221,6 +246,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/u/$username': {
+      id: '/u/$username'
+      path: '/u/$username'
+      fullPath: '/u/$username'
+      preLoaderRoute: typeof UUsernameRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/upload-marks': {
@@ -263,6 +295,13 @@ declare module '@tanstack/react-router' {
       path: '/readiness'
       fullPath: '/readiness'
       preLoaderRoute: typeof AppReadinessRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/profile-share': {
+      id: '/_app/profile-share'
+      path: '/profile-share'
+      fullPath: '/profile-share'
+      preLoaderRoute: typeof AppProfileShareRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/placement-tracker': {
@@ -325,6 +364,7 @@ interface AppRouteChildren {
   AppHistoryRoute: typeof AppHistoryRoute
   AppPlacementRoute: typeof AppPlacementRoute
   AppPlacementTrackerRoute: typeof AppPlacementTrackerRoute
+  AppProfileShareRoute: typeof AppProfileShareRoute
   AppReadinessRoute: typeof AppReadinessRoute
   AppRoadmapRoute: typeof AppRoadmapRoute
   AppSettingsRoute: typeof AppSettingsRoute
@@ -341,6 +381,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppHistoryRoute: AppHistoryRoute,
   AppPlacementRoute: AppPlacementRoute,
   AppPlacementTrackerRoute: AppPlacementTrackerRoute,
+  AppProfileShareRoute: AppProfileShareRoute,
   AppReadinessRoute: AppReadinessRoute,
   AppRoadmapRoute: AppRoadmapRoute,
   AppSettingsRoute: AppSettingsRoute,
@@ -354,6 +395,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
+  UUsernameRoute: UUsernameRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

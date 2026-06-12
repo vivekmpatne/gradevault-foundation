@@ -13,6 +13,8 @@ import {
   Users,
   Trophy,
   XCircle,
+  LayoutGrid,
+  List as ListIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -123,6 +125,8 @@ function PlacementTrackerPage() {
   const [form, setForm] = useState<FormState>(emptyForm());
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [view, setView] = useState<"list" | "board">("list");
+  const [draggingId, setDraggingId] = useState<string | null>(null);
 
   const companies = useMemo(
     () => Array.from(new Set(apps.map((a) => a.company))).sort(),
@@ -252,9 +256,29 @@ function PlacementTrackerPage() {
             Track every internship and placement application in one place.
           </p>
         </div>
-        <Button onClick={openAdd} className="self-start sm:self-auto">
-          <Plus className="size-4" /> Add Application
-        </Button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <div className="inline-flex rounded-md border p-0.5">
+            <Button
+              size="sm"
+              variant={view === "list" ? "secondary" : "ghost"}
+              onClick={() => setView("list")}
+              className="h-7 gap-1.5"
+            >
+              <ListIcon className="size-3.5" /> List
+            </Button>
+            <Button
+              size="sm"
+              variant={view === "board" ? "secondary" : "ghost"}
+              onClick={() => setView("board")}
+              className="h-7 gap-1.5"
+            >
+              <LayoutGrid className="size-3.5" /> Board
+            </Button>
+          </div>
+          <Button onClick={openAdd}>
+            <Plus className="size-4" /> Add Application
+          </Button>
+        </div>
       </div>
 
       {/* Dashboard Cards */}
@@ -359,7 +383,8 @@ function PlacementTrackerPage() {
         </CardContent>
       </Card>
 
-      {/* List */}
+      {/* List view */}
+      {view === "list" && (
       <Card>
         <CardHeader>
           <CardTitle>Applications</CardTitle>
@@ -501,6 +526,22 @@ function PlacementTrackerPage() {
           )}
         </CardContent>
       </Card>
+      )}
+
+      {/* Board (Kanban) view */}
+      {view === "board" && (
+        <KanbanBoard
+          apps={filtered}
+          draggingId={draggingId}
+          setDraggingId={setDraggingId}
+          onDrop={(id, status) => {
+            updateApplication(id, { status });
+            toast.success(`Moved to ${status}`);
+          }}
+          onEdit={openEdit}
+          onDelete={(id) => setDeleteId(id)}
+        />
+      )}
 
       {/* Add/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -649,5 +690,137 @@ function StatCard({
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+const BOARD_COLUMNS: ApplicationStatus[] = [
+  "Wishlist",
+  "Applied",
+  "OA Scheduled",
+  "Interview Scheduled",
+  "Offer Received",
+  "Rejected",
+];
+
+function KanbanBoard({
+  apps,
+  draggingId,
+  setDraggingId,
+  onDrop,
+  onEdit,
+  onDelete,
+}: {
+  apps: Application[];
+  draggingId: string | null;
+  setDraggingId: (id: string | null) => void;
+  onDrop: (id: string, status: ApplicationStatus) => void;
+  onEdit: (a: Application) => void;
+  onDelete: (id: string) => void;
+}) {
+  return (
+    <div className="overflow-x-auto -mx-3 sm:mx-0 px-3 sm:px-0">
+      <div className="flex gap-3 min-w-max sm:min-w-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        {BOARD_COLUMNS.map((status) => {
+          const colApps = apps.filter((a) => a.status === status);
+          return (
+            <div
+              key={status}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = "move";
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                const id = e.dataTransfer.getData("text/plain");
+                if (id) onDrop(id, status);
+                setDraggingId(null);
+              }}
+              className={cn(
+                "w-72 sm:w-auto shrink-0 rounded-lg border bg-muted/30 flex flex-col",
+                draggingId && "ring-1 ring-primary/20",
+              )}
+            >
+              <div className="p-3 border-b flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Badge
+                    variant="outline"
+                    className={cn("text-xs", STATUS_TONE[status])}
+                  >
+                    {status}
+                  </Badge>
+                </div>
+                <span className="text-xs text-muted-foreground tabular-nums">
+                  {colApps.length}
+                </span>
+              </div>
+              <div className="p-2 space-y-2 min-h-[120px]">
+                {colApps.length === 0 && (
+                  <p className="text-xs text-muted-foreground text-center py-6">
+                    Drop here
+                  </p>
+                )}
+                {colApps.map((a) => (
+                  <div
+                    key={a.id}
+                    draggable
+                    onDragStart={(e) => {
+                      e.dataTransfer.setData("text/plain", a.id);
+                      e.dataTransfer.effectAllowed = "move";
+                      setDraggingId(a.id);
+                    }}
+                    onDragEnd={() => setDraggingId(null)}
+                    className={cn(
+                      "rounded-md border bg-background p-2.5 space-y-1 cursor-grab active:cursor-grabbing transition-opacity",
+                      draggingId === a.id && "opacity-40",
+                    )}
+                  >
+                    <div className="flex items-start justify-between gap-1.5">
+                      <div className="font-medium text-sm truncate flex-1">
+                        {a.company}
+                      </div>
+                      {a.link && (
+                        <a
+                          href={a.link}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-muted-foreground hover:text-foreground"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <ExternalLink className="size-3" />
+                        </a>
+                      )}
+                    </div>
+                    <div className="text-xs text-muted-foreground truncate">
+                      {a.role}
+                    </div>
+                    <div className="flex items-center justify-between text-[10px] text-muted-foreground pt-1">
+                      <span className="tabular-nums">{a.applicationDate}</span>
+                      <div className="flex gap-0.5">
+                        <button
+                          type="button"
+                          onClick={() => onEdit(a)}
+                          className="p-1 hover:bg-muted rounded"
+                          aria-label="Edit"
+                        >
+                          <Pencil className="size-3" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onDelete(a.id)}
+                          className="p-1 hover:bg-muted rounded"
+                          aria-label="Delete"
+                        >
+                          <Trash2 className="size-3 text-destructive" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }
