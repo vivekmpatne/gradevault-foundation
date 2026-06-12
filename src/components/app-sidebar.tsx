@@ -9,6 +9,7 @@ import {
   Map,
   Settings,
   LogOut,
+  Users,
 } from "lucide-react";
 import {
   Sidebar,
@@ -85,6 +86,16 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
+        <Button
+          variant="ghost"
+          size={collapsed ? "icon" : "default"}
+          onClick={handleLogout}
+          className="justify-start"
+          title="Switch Account"
+        >
+          <Users className="size-4" />
+          {!collapsed && <span>Switch Account</span>}
+        </Button>
         <Button
           variant="ghost"
           size={collapsed ? "icon" : "default"}
