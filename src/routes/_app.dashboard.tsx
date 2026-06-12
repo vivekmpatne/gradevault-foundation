@@ -14,7 +14,9 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   ArrowRight,
+  Download,
 } from "lucide-react";
+import { exportDashboardPdf } from "@/lib/pdf-export";
 import {
   Card,
   CardContent,
@@ -188,17 +190,26 @@ function DashboardPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-          Welcome, {student.profile.name.split(" ")[0]}
-        </h1>
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
-          <span className="font-mono">{student.profile.usn}</span>
-          <span className="hidden sm:inline">•</span>
-          <span>{student.profile.branch}</span>
-          <span className="hidden sm:inline">•</span>
-          <span>Semester {currentSemester}</span>
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+        <div className="flex flex-col gap-2 min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+            Welcome, {student.profile.name.split(" ")[0]}
+          </h1>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+            <span className="font-mono">{student.profile.usn}</span>
+            <span className="hidden sm:inline">•</span>
+            <span>{student.profile.branch}</span>
+            <span className="hidden sm:inline">•</span>
+            <span>Semester {currentSemester}</span>
+          </div>
         </div>
+        <Button
+          onClick={() => exportDashboardPdf(data, settings)}
+          className="shrink-0 gap-2"
+        >
+          <Download className="size-4" />
+          Export PDF
+        </Button>
       </div>
 
       <Card>
