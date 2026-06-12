@@ -284,23 +284,40 @@ function DashboardPage() {
 
       {!hasData ? (
         <Card>
-          <CardContent className="py-12 flex flex-col items-center text-center gap-4">
-            <div className="size-14 rounded-2xl bg-muted flex items-center justify-center">
-              <BookOpen className="size-7 text-muted-foreground" />
-            </div>
-            <div className="space-y-1">
-              <p className="font-medium">No academic records found.</p>
-              <p className="text-sm text-muted-foreground">
-                Add your semester data from the Calculator tab to see your
-                stats and trend.
+          <CardContent className="py-10 space-y-6">
+            <div className="flex flex-col items-center text-center gap-2">
+              <div className="size-14 rounded-2xl bg-muted flex items-center justify-center">
+                <BookOpen className="size-7 text-muted-foreground" />
+              </div>
+              <p className="font-medium">No semester data yet</p>
+              <p className="text-sm text-muted-foreground max-w-md">
+                Start by adding your first semester, calculating an SGPA, or
+                setting a target CGPA. Everything updates automatically.
               </p>
             </div>
-            <Button asChild>
-              <Link to="/calculator">
-                <CalculatorIcon className="size-4" />
-                Go to Calculator
-              </Link>
-            </Button>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <Button asChild variant="outline" className="h-auto py-4 flex-col gap-1">
+                <Link to="/calculator">
+                  <CalculatorIcon className="size-5" />
+                  <span className="font-medium">Add Semester {currentSemester}</span>
+                  <span className="text-xs text-muted-foreground">Enter subjects & marks</span>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-auto py-4 flex-col gap-1">
+                <Link to="/calculator">
+                  <Sparkles className="size-5" />
+                  <span className="font-medium">Use Calculator</span>
+                  <span className="text-xs text-muted-foreground">Quick SGPA / CGPA</span>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-auto py-4 flex-col gap-1">
+                <Link to="/settings">
+                  <TrendingUp className="size-5" />
+                  <span className="font-medium">Set Target CGPA</span>
+                  <span className="text-xs text-muted-foreground">Goal-based tracking</span>
+                </Link>
+              </Button>
+            </div>
           </CardContent>
         </Card>
       ) : (
