@@ -13,6 +13,8 @@ import {
   Users,
   Trophy,
   XCircle,
+  LayoutGrid,
+  List as ListIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
