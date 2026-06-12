@@ -561,23 +561,39 @@ function NumField({
   onCommit,
   min = 0,
   max = 100_000,
+  readOnly = false,
+  syncedFrom,
 }: {
   label: string;
   value: number;
   onCommit: (v: number) => void;
   min?: number;
   max?: number;
+  readOnly?: boolean;
+  syncedFrom?: string;
 }) {
   return (
     <div className="space-y-1.5">
-      <Label>{label}</Label>
+      <div className="flex items-center justify-between gap-2 min-h-[1.25rem]">
+        <Label className="truncate">{label}</Label>
+        {syncedFrom && (
+          <span className="text-[10px] uppercase tracking-wide text-muted-foreground shrink-0">
+            {syncedFrom}
+          </span>
+        )}
+      </div>
       <Input
         type="number"
         min={min}
         max={max}
         step={1}
+        readOnly={readOnly}
+        tabIndex={readOnly ? -1 : 0}
         defaultValue={value}
+        key={`${value}-${readOnly}`}
+        className={cn(readOnly && "bg-muted/40 cursor-default")}
         onBlur={(e) => {
+          if (readOnly) return;
           const n = parseInt(e.target.value, 10);
           const safe = Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : min;
           if (safe !== value) {
@@ -589,6 +605,32 @@ function NumField({
     </div>
   );
 }
+
+function SyncedAt({
+  meta,
+}: {
+  meta: Partial<Record<SyncPlatform, number>>;
+}) {
+  const latest = Math.max(
+    meta.leetcode ?? 0,
+    meta.codeforces ?? 0,
+    meta.github ?? 0,
+  );
+  if (!latest) {
+    return <span className="text-muted-foreground">Not synced yet.</span>;
+  }
+  const mins = Math.round((Date.now() - latest) / 60_000);
+  const rel =
+    mins < 1 ? "just now" : mins < 60 ? `${mins}m ago` : `${Math.round(mins / 60)}h ago`;
+  return <span className="text-muted-foreground">Last sync: {rel}</span>;
+}
+
+function labelFor(p: SyncPlatform): string {
+  if (p === "leetcode") return "LeetCode";
+  if (p === "codeforces") return "Codeforces";
+  return "GitHub";
+}
+
 
 function TrackerCard({
   title,
