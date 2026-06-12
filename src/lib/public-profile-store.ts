@@ -71,8 +71,8 @@ export function buildSnapshot(
       leetcodeUsername: settings.leetcodeUsername || undefined,
       codeforcesHandle: settings.codeforcesHandle || undefined,
       githubUsername: settings.githubUsername || undefined,
-      leetcodeSolved: settings.leetcodeSolved || undefined,
-      codeforcesRating: settings.codeforcesRating || undefined,
+      leetcodeSolved: settings.leetcode || undefined,
+      codeforcesRating: settings.codeforces || undefined,
       githubRepos: settings.githubRepos || undefined,
     },
     links: {
