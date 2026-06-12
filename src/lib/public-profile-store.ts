@@ -1,47 +1,19 @@
 /**
- * Public profile snapshot store (Phase 2 — slim).
+ * Public profile snapshot — client-side helpers.
  *
- * Stores a read-only snapshot of the student's Career OS card in
- * localStorage under a username handle. Future versions will sync this
- * to Lovable Cloud so /u/$username is shareable across devices; for now
- * the link works on the same browser and demonstrates the architecture.
+ * The snapshot itself is stored in Cloud (`profile_snapshots`) via server
+ * functions. This module owns:
+ *  - building a snapshot from current academic + settings state
+ *  - per-username claim tokens stored in localStorage so the original
+ *    publisher (and only they) can update or unpublish from this browser
  */
 import type { AcademicData } from "@/lib/academic-store";
 import type { StudentSettings } from "@/lib/settings-store";
+import type { PublicSnapshot } from "@/lib/public-profile.functions";
 
-const KEY_PREFIX = "gradevault_public_profile:";
-const INDEX_KEY = "gradevault_public_profile_index";
+export type PublicProfileSnapshot = PublicSnapshot;
 
-export type PublicProfileSnapshot = {
-  version: 1;
-  updatedAt: number;
-  username: string;
-  displayName: string;
-  branch?: string;
-  college?: string;
-  currentSemester: number;
-  cgpa: number;
-  latestSgpa: number;
-  totalCredits: number;
-  completedSemesters: number;
-  coding: {
-    leetcodeUsername?: string;
-    codeforcesHandle?: string;
-    githubUsername?: string;
-    leetcodeSolved?: number;
-    codeforcesRating?: number;
-    githubRepos?: number;
-  };
-  links: {
-    linkedin?: string;
-    codolio?: string;
-  };
-  goals: {
-    careerGoal?: string;
-    targetCGPA?: number;
-  };
-  projects: number;
-};
+const CLAIM_PREFIX = "gradevault_profile_claim:";
 
 export function usernameFromUsn(usn: string): string {
   return usn.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -87,44 +59,34 @@ export function buildSnapshot(
   };
 }
 
-function readIndex(): string[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(INDEX_KEY);
-    return raw ? (JSON.parse(raw) as string[]) : [];
-  } catch {
-    return [];
+function randomToken(): string {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return `${crypto.randomUUID()}${crypto.randomUUID().replace(/-/g, "")}`.slice(
+      0,
+      64,
+    );
   }
+  return Math.random().toString(36).slice(2) + Date.now().toString(36).repeat(3);
 }
 
-function writeIndex(list: string[]) {
-  localStorage.setItem(INDEX_KEY, JSON.stringify(Array.from(new Set(list))));
+export function getOrCreateClaimToken(username: string): string {
+  if (typeof window === "undefined") return "";
+  const key = CLAIM_PREFIX + username;
+  const existing = localStorage.getItem(key);
+  if (existing) return existing;
+  const token = randomToken();
+  localStorage.setItem(key, token);
+  return token;
 }
 
-export function publishSnapshot(snap: PublicProfileSnapshot): void {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(KEY_PREFIX + snap.username, JSON.stringify(snap));
-  writeIndex([...readIndex(), snap.username]);
-}
-
-export function unpublishSnapshot(username: string): void {
-  if (typeof window === "undefined") return;
-  localStorage.removeItem(KEY_PREFIX + username);
-  writeIndex(readIndex().filter((u) => u !== username));
-}
-
-export function loadSnapshot(username: string): PublicProfileSnapshot | null {
+export function getClaimToken(username: string): string | null {
   if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem(KEY_PREFIX + username.toLowerCase());
-    return raw ? (JSON.parse(raw) as PublicProfileSnapshot) : null;
-  } catch {
-    return null;
-  }
+  return localStorage.getItem(CLAIM_PREFIX + username);
 }
 
-export function isPublished(username: string): boolean {
-  return !!loadSnapshot(username);
+export function clearClaimToken(username: string): void {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(CLAIM_PREFIX + username);
 }
 
 export function shareUrl(username: string): string {

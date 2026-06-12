@@ -8,6 +8,7 @@ import {
   Globe,
   EyeOff,
   RefreshCw,
+  Loader2,
 } from "lucide-react";
 import {
   Card,
@@ -22,13 +23,16 @@ import { Input } from "@/components/ui/input";
 import { useStudent } from "@/lib/student-store";
 import {
   buildSnapshot,
-  isPublished,
-  loadSnapshot,
-  publishSnapshot,
+  clearClaimToken,
+  getOrCreateClaimToken,
   shareUrl,
-  unpublishSnapshot,
   usernameFromUsn,
 } from "@/lib/public-profile-store";
+import {
+  getPublicProfileSnapshot,
+  publishProfileSnapshot,
+  unpublishProfileSnapshot,
+} from "@/lib/public-profile.functions";
 
 export const Route = createFileRoute("/_app/profile-share")({
   component: ProfileSharePage,
@@ -37,7 +41,9 @@ export const Route = createFileRoute("/_app/profile-share")({
 function ProfileSharePage() {
   const { academic, settings, profileCompletion } = useStudent();
   const [published, setPublished] = useState(false);
-  const [updatedAt, setUpdatedAt] = useState<number | null>(null);
+  const [updatedAt, setUpdatedAt] = useState<string | null>(null);
+  const [busy, setBusy] = useState<"publish" | "unpublish" | null>(null);
+  const [checking, setChecking] = useState(true);
 
   const username = academic.student
     ? usernameFromUsn(academic.student.profile.usn)
@@ -46,10 +52,21 @@ function ProfileSharePage() {
   const url = username ? shareUrl(username) : "";
 
   useEffect(() => {
-    if (!username) return;
-    const snap = loadSnapshot(username);
-    setPublished(!!snap);
-    setUpdatedAt(snap?.updatedAt ?? null);
+    if (!username) {
+      setChecking(false);
+      return;
+    }
+    setChecking(true);
+    getPublicProfileSnapshot({ data: { username } })
+      .then((res) => {
+        setPublished(!!res.snapshot);
+        setUpdatedAt(res.updatedAt);
+      })
+      .catch(() => {
+        setPublished(false);
+        setUpdatedAt(null);
+      })
+      .finally(() => setChecking(false));
   }, [username]);
 
   if (!academic.student) {
@@ -60,24 +77,49 @@ function ProfileSharePage() {
     );
   }
 
-  const handlePublish = () => {
-    const snap = buildSnapshot(academic, settings);
-    if (!snap) {
+  const handlePublish = async () => {
+    const snapshot = buildSnapshot(academic, settings);
+    if (!snapshot) {
       toast.error("Could not build profile snapshot");
       return;
     }
-    publishSnapshot(snap);
-    setPublished(true);
-    setUpdatedAt(snap.updatedAt);
-    toast.success(published ? "Profile snapshot refreshed" : "Profile published");
+    const claimToken = getOrCreateClaimToken(snapshot.username);
+    setBusy("publish");
+    try {
+      const res = await publishProfileSnapshot({
+        data: { snapshot, claimToken },
+      });
+      setPublished(true);
+      setUpdatedAt(new Date(res.updatedAt).toISOString());
+      toast.success(published ? "Profile refreshed" : "Profile published");
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Publish failed. Try again.",
+      );
+    } finally {
+      setBusy(null);
+    }
   };
 
-  const handleUnpublish = () => {
+  const handleUnpublish = async () => {
     if (!username) return;
-    unpublishSnapshot(username);
-    setPublished(false);
-    setUpdatedAt(null);
-    toast.success("Profile unpublished");
+    const claimToken = getOrCreateClaimToken(username);
+    setBusy("unpublish");
+    try {
+      await unpublishProfileSnapshot({
+        data: { username, claimToken },
+      });
+      clearClaimToken(username);
+      setPublished(false);
+      setUpdatedAt(null);
+      toast.success("Profile unpublished");
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Unpublish failed. Try again.",
+      );
+    } finally {
+      setBusy(null);
+    }
   };
 
   const handleCopy = async () => {
@@ -96,7 +138,8 @@ function ProfileSharePage() {
           <Share2 className="size-6" /> Public Profile
         </h1>
         <p className="text-muted-foreground mt-1">
-          Publish a read-only Career OS card at a shareable URL.
+          Publish a read-only Career OS card at a shareable URL — viewable from
+          any device.
         </p>
       </div>
 
@@ -105,7 +148,12 @@ function ProfileSharePage() {
           <div className="flex items-start justify-between gap-3 flex-wrap">
             <div>
               <CardTitle className="flex items-center gap-2">
-                {published ? (
+                {checking ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin text-muted-foreground" />{" "}
+                    Checking…
+                  </>
+                ) : published ? (
                   <>
                     <Globe className="size-4 text-emerald-600" /> Live
                   </>
@@ -117,8 +165,8 @@ function ProfileSharePage() {
                 )}
               </CardTitle>
               <CardDescription>
-                {published
-                  ? `Last refreshed ${updatedAt ? new Date(updatedAt).toLocaleString() : ""}`
+                {published && updatedAt
+                  ? `Last updated ${new Date(updatedAt).toLocaleString()}`
                   : "Publish to generate a shareable link."}
               </CardDescription>
             </div>
@@ -141,13 +189,26 @@ function ProfileSharePage() {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <Button onClick={handlePublish}>
-              <RefreshCw className="size-4" />
+            <Button onClick={handlePublish} disabled={busy !== null}>
+              {busy === "publish" ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <RefreshCw className="size-4" />
+              )}
               {published ? "Refresh snapshot" : "Publish profile"}
             </Button>
             {published && (
-              <Button variant="outline" onClick={handleUnpublish}>
-                <EyeOff className="size-4" /> Unpublish
+              <Button
+                variant="outline"
+                onClick={handleUnpublish}
+                disabled={busy !== null}
+              >
+                {busy === "unpublish" ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <EyeOff className="size-4" />
+                )}
+                Unpublish
               </Button>
             )}
           </div>
@@ -159,14 +220,15 @@ function ProfileSharePage() {
               <Link to="/settings" className="underline font-medium">
                 Settings
               </Link>{" "}
-              before publishing for a better share card.
+              for a stronger share card.
             </div>
           )}
 
           <p className="text-xs text-muted-foreground">
             Snapshot includes: name, branch, college, semester, CGPA, coding
-            stats, project count, public links. Today the snapshot is stored
-            in your browser; cross-device sharing arrives with Cloud sync.
+            stats, project count, and any public links you've added. Updates
+            and unpublishing are protected by a private claim token stored in
+            this browser only.
           </p>
         </CardContent>
       </Card>
