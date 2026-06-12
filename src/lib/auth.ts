@@ -43,9 +43,6 @@ export const SEED_STUDENTS: Student[] = (studentsData as Student[]).map((s) => (
   source: "seed",
 }));
 
-// Back-compat alias
-export const STUDENTS = SEED_STUDENTS;
-
 function emitStudentsChanged() {
   if (typeof window === "undefined") return;
   window.dispatchEvent(new Event(STUDENTS_EVENT));
