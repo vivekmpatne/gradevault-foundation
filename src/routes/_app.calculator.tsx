@@ -442,6 +442,12 @@ function CalculatorPage() {
           )}
 
           <div className="flex flex-wrap gap-2 justify-end pt-2 border-t">
+            {selected !== NEW_SEM && saved[Number(selected)] && (
+              <Button variant="ghost" onClick={handleDelete}>
+                <Trash2 className="size-4" />
+                Delete Semester
+              </Button>
+            )}
             <Button variant="outline" onClick={handleClear}>
               <Eraser className="size-4" />
               Clear Draft
