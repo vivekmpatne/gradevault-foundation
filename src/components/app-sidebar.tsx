@@ -9,6 +9,7 @@ import {
   Map,
   Settings,
   LogOut,
+  Users,
 } from "lucide-react";
 import {
   Sidebar,
