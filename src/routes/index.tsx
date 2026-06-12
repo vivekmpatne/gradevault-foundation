@@ -37,11 +37,9 @@ import {
   type Student,
 } from "@/lib/auth";
 import {
-  DEFAULT_SETTINGS,
-  loadSettings,
-  saveSettings,
   type PrepTrack,
 } from "@/lib/settings-store";
+import { updateSettings } from "@/lib/student-store";
 
 export const Route = createFileRoute("/")({
   head: () => ({
