@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { DashboardSkeleton } from "@/components/dashboard-skeleton";
 import {
   GraduationCap,
   TrendingUp,
