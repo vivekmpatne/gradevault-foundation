@@ -184,8 +184,20 @@ function CalculatorPage() {
       toast.error(validation[0]);
       return;
     }
+    if (subjects.length === 0) {
+      toast.error("Add at least one subject");
+      return;
+    }
     if (selected === NEW_SEM) {
+      if (Object.keys(saved).length >= 8) {
+        toast.error("All 8 semesters already exist. Edit one instead.");
+        return;
+      }
       const next = nextAvailableSemester(saved);
+      if (saved[next]) {
+        toast.error(`Semester ${next} already exists. Pick it from the dropdown to edit.`);
+        return;
+      }
       const sem: CalcSemester = {
         number: next,
         subjects,
@@ -300,15 +312,15 @@ function CalculatorPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Desktop table */}
-          <div className="hidden md:block rounded-md border">
+          <div className="hidden md:block rounded-md border overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead className="min-w-[200px]">Subject</TableHead>
-                  <TableHead className="w-[110px]">Credits</TableHead>
-                  <TableHead className="w-[110px]">Marks</TableHead>
-                  <TableHead className="w-[100px]">GP</TableHead>
-                  <TableHead className="w-[120px]">Credit Points</TableHead>
+                  <TableHead className="min-w-[110px]">Credits</TableHead>
+                  <TableHead className="min-w-[110px]">Marks</TableHead>
+                  <TableHead className="min-w-[100px]">GP</TableHead>
+                  <TableHead className="min-w-[120px]">Credit Points</TableHead>
                   <TableHead className="w-[60px]" />
                 </TableRow>
               </TableHeader>

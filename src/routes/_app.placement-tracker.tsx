@@ -213,7 +213,13 @@ function PlacementTrackerPage() {
       updateApplication(editingId, payload);
       toast.success("Application updated");
     } else {
-      addApplication(payload);
+      const added = addApplication(payload);
+      if (!added) {
+        toast.error(
+          `Duplicate: ${payload.company} • ${payload.role} on ${payload.applicationDate} already exists.`,
+        );
+        return;
+      }
       toast.success("Application added");
     }
     setDialogOpen(false);
