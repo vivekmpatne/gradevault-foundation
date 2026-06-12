@@ -45,7 +45,7 @@ import {
   isLocalStudent,
   updateLocalStudent,
 } from "@/lib/auth";
-import { useStudent } from "@/lib/student-store";
+import { useStudent, updateSettings, updateProfile } from "@/lib/student-store";
 import {
   DEFAULT_SETTINGS,
   loadSettings,
