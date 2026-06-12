@@ -318,7 +318,8 @@ function CalculatorPage() {
                         type="number"
                         min={1}
                         max={4}
-                        value={r.credits}
+                        placeholder="Credits"
+                        value={r.credits || ""}
                         onChange={(e) =>
                           updateSubject(r.id, {
                             credits: clampInt(e.target.value, 0, 4),
@@ -331,7 +332,8 @@ function CalculatorPage() {
                         type="number"
                         min={0}
                         max={100}
-                        value={r.marks}
+                        placeholder="Enter Marks"
+                        value={r.marks || ""}
                         onChange={(e) =>
                           updateSubject(r.id, {
                             marks: clampInt(e.target.value, 0, 100),
@@ -400,7 +402,8 @@ function CalculatorPage() {
                       type="number"
                       min={1}
                       max={4}
-                      value={r.credits}
+                      placeholder="Credits"
+                      value={r.credits || ""}
                       onChange={(e) =>
                         updateSubject(r.id, {
                           credits: clampInt(e.target.value, 0, 4),
@@ -414,7 +417,8 @@ function CalculatorPage() {
                       type="number"
                       min={0}
                       max={100}
-                      value={r.marks}
+                      placeholder="Enter Marks"
+                      value={r.marks || ""}
                       onChange={(e) =>
                         updateSubject(r.id, {
                           marks: clampInt(e.target.value, 0, 100),
