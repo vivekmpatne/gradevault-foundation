@@ -56,6 +56,7 @@ import {
   type StudentSettings,
   type ThemeMode,
 } from "@/lib/settings-store";
+import { downloadProfileBackup, importProfile } from "@/lib/profile-backup";
 
 export const Route = createFileRoute("/_app/settings")({
   component: SettingsPage,
@@ -112,50 +113,20 @@ function SettingsPage() {
   }
 
   function handleExport() {
-    const data: Record<string, unknown> = {
-      exportedAt: new Date().toISOString(),
-      usn: session!.usn,
-      settings: loadSettings(),
-      semesters: {},
-    };
-    const calcKey = `${CALC_PREFIX}${session!.usn.toUpperCase()}`;
-    const raw = localStorage.getItem(calcKey);
-    if (raw) {
-      try {
-        data.semesters = JSON.parse(raw);
-      } catch {
-        // ignore
-      }
-    }
-    const blob = new Blob([JSON.stringify(data, null, 2)], {
-      type: "application/json",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `gradevault-${session!.usn}-${Date.now()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success("Backup exported");
+    const ok = downloadProfileBackup();
+    if (ok) toast.success("Full profile exported");
+    else toast.error("Nothing to export — sign in first");
   }
 
   async function handleImport(file: File) {
-    try {
-      const text = await file.text();
-      const parsed = JSON.parse(text);
-      if (parsed.settings) {
-        saveSettings({ ...DEFAULT_SETTINGS, ...parsed.settings });
-        setForm({ ...DEFAULT_SETTINGS, ...parsed.settings });
-      }
-      if (parsed.semesters && typeof parsed.semesters === "object") {
-        const calcKey = `${CALC_PREFIX}${session!.usn.toUpperCase()}`;
-        localStorage.setItem(calcKey, JSON.stringify(parsed.semesters));
-        window.dispatchEvent(new Event("gradevault:academic-changed"));
-      }
-      toast.success("Backup imported");
-    } catch {
-      toast.error("Invalid backup file");
+    const text = await file.text();
+    const res = importProfile(text);
+    if (!res.ok) {
+      toast.error(res.error || "Invalid backup file");
+      return;
     }
+    setForm(loadSettings());
+    toast.success(`Backup restored (${res.restored} entries)`);
   }
 
   function handleClearDraft() {

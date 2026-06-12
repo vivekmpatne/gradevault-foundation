@@ -49,8 +49,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { useAcademicData } from "@/lib/academic-store";
-import { useSettings } from "@/lib/settings-store";
+import { useStudent } from "@/lib/student-store";
+import { Progress } from "@/components/ui/progress";
 
 export const Route = createFileRoute("/_app/dashboard")({
   component: DashboardPage,
@@ -70,8 +70,7 @@ function sgpaColor(v: number): string {
 
 function DashboardPage() {
   const navigate = useNavigate();
-  const data = useAcademicData();
-  const { settings } = useSettings();
+  const { academic: data, settings, profileCompletion } = useStudent();
   const [bootstrapped, setBootstrapped] = useState(false);
 
   useEffect(() => {
@@ -280,6 +279,50 @@ function DashboardPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Profile Completion */}
+      <Card>
+        <CardHeader className="flex flex-row items-start justify-between gap-3 space-y-0">
+          <div>
+            <CardTitle className="text-base">Profile Completion</CardTitle>
+            <CardDescription className="mt-1">
+              {profileCompletion.total >= 80
+                ? "Your profile looks great."
+                : "Fill in the missing details for sharper recommendations."}
+            </CardDescription>
+          </div>
+          <Badge variant="outline" className="font-mono">
+            {profileCompletion.total}%
+          </Badge>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <Progress value={profileCompletion.total} />
+          {profileCompletion.total < 100 && profileCompletion.missing.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {profileCompletion.missing.slice(0, 5).map((m) => (
+                <Badge key={m} variant="secondary" className="text-xs font-normal">
+                  {m}
+                </Badge>
+              ))}
+              {profileCompletion.missing.length > 5 && (
+                <Badge variant="secondary" className="text-xs font-normal">
+                  +{profileCompletion.missing.length - 5} more
+                </Badge>
+              )}
+            </div>
+          )}
+          {profileCompletion.total < 80 && (
+            <Button asChild size="sm" variant="outline" className="gap-2">
+              <Link to="/settings">
+                Complete profile
+                <ArrowRight className="size-3.5" />
+              </Link>
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+
+
 
 
       {!hasData ? (

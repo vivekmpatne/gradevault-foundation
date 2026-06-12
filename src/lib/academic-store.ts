@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import {
   getCurrentStudent,
   getSession,
+  STUDENTS_EVENT,
   type Student,
 } from "@/lib/auth";
 import {
@@ -217,12 +218,16 @@ export function useAcademicData(): AcademicData {
     refresh();
     const onChange = () => refresh();
     const onStorage = (e: StorageEvent) => {
-      if (!e.key || e.key.startsWith(KEY_PREFIX)) refresh();
+      if (!e.key || e.key.startsWith(KEY_PREFIX) || e.key === "gradevault_students" || e.key === "gradevault_session") {
+        refresh();
+      }
     };
     window.addEventListener(ACADEMIC_EVENT, onChange);
+    window.addEventListener(STUDENTS_EVENT, onChange);
     window.addEventListener("storage", onStorage);
     return () => {
       window.removeEventListener(ACADEMIC_EVENT, onChange);
+      window.removeEventListener(STUDENTS_EVENT, onChange);
       window.removeEventListener("storage", onStorage);
     };
   }, [refresh]);
