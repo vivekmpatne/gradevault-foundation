@@ -68,6 +68,9 @@ function DashboardPage() {
     percentage,
     status,
     hasData,
+    completedSemesters,
+    currentSemester,
+    latestSemesterNumber,
   } = data;
 
   const statusToneClass: Record<typeof status.tone, string> = {
@@ -93,9 +96,7 @@ function DashboardPage() {
       label: "Latest SGPA",
       value: hasData ? latestSgpa.toFixed(2) : "—",
       icon: Sparkles,
-      hint: hasData
-        ? `Semester ${semesters[semesters.length - 1].number}`
-        : "No data yet",
+      hint: hasData ? `Semester ${latestSemesterNumber}` : "No data yet",
     },
     {
       label: "Credits Completed",
@@ -111,9 +112,9 @@ function DashboardPage() {
     },
     {
       label: "Current Semester",
-      value: String(student.profile.currentSemester),
+      value: String(currentSemester),
       icon: CalendarDays,
-      hint: "Ongoing term",
+      hint: `${completedSemesters} completed`,
     },
     {
       label: "Academic Status",
@@ -135,7 +136,7 @@ function DashboardPage() {
           <span className="hidden sm:inline">•</span>
           <span>{student.profile.branch}</span>
           <span className="hidden sm:inline">•</span>
-          <span>Semester {student.profile.currentSemester}</span>
+          <span>Semester {currentSemester}</span>
         </div>
       </div>
 
@@ -156,11 +157,11 @@ function DashboardPage() {
             <ProfileField label="Branch" value={student.profile.branch} />
             <ProfileField
               label="Current Semester"
-              value={`Sem ${student.profile.currentSemester}`}
+              value={`Sem ${currentSemester}`}
             />
             <ProfileField
               label="Semesters Completed"
-              value={String(semesters.length)}
+              value={String(completedSemesters)}
             />
             <ProfileField
               label="Current CGPA"
