@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import {
   getCurrentStudent,
   getSession,
+  STUDENTS_EVENT,
   type Student,
 } from "@/lib/auth";
 import {
