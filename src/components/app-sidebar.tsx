@@ -13,6 +13,7 @@ import {
   ClipboardList,
   Gauge,
   Compass,
+  MessageSquare,
 } from "lucide-react";
 import {
   Sidebar,
