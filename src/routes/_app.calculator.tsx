@@ -41,6 +41,16 @@ import {
 } from "@/components/ui/table";
 import { getCurrentStudent, type Student } from "@/lib/auth";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   gradePointFromMarks,
   loadAllSemesters,
   newSubject,
