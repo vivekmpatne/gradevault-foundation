@@ -212,6 +212,7 @@ function DashboardPage() {
         </Button>
       </div>
 
+      <Card>
         <CardHeader className="flex flex-row items-start gap-4 space-y-0">
           <div className="size-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
             <IdCard className="size-6" />
