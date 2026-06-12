@@ -33,6 +33,7 @@ import {
   useSettings,
 } from "@/lib/settings-store";
 import { cn } from "@/lib/utils";
+import { GithubIntegrationPanel } from "@/components/github-integration-panel";
 
 export const Route = createFileRoute("/_app/coding-hub")({
   component: CodingHubPage,
