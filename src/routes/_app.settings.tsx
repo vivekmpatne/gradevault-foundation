@@ -243,7 +243,8 @@ function SettingsPage() {
                 min={0}
                 max={10}
                 step={0.1}
-                value={form.targetCGPA}
+                placeholder="Enter Target CGPA"
+                value={form.targetCGPA || ""}
                 onChange={(e) =>
                   update("targetCGPA", Number(e.target.value) || 0)
                 }
@@ -256,7 +257,8 @@ function SettingsPage() {
                   id="tlpa"
                   type="number"
                   min={0}
-                  value={form.targetLPA}
+                  placeholder="Enter Target LPA"
+                  value={form.targetLPA || ""}
                   onChange={(e) =>
                     update("targetLPA", Number(e.target.value) || 0)
                   }
@@ -271,7 +273,8 @@ function SettingsPage() {
                   type="number"
                   min={0}
                   max={1000}
-                  value={form.targetGATE}
+                  placeholder="Enter Target GATE Score"
+                  value={form.targetGATE || ""}
                   onChange={(e) =>
                     update("targetGATE", Number(e.target.value) || 0)
                   }
@@ -485,7 +488,8 @@ function Numeric({
         id={id}
         type="number"
         min={0}
-        value={value}
+        placeholder={`Enter ${label}`}
+        value={value || ""}
         onChange={(e) => onChange(Number(e.target.value) || 0)}
       />
     </div>
