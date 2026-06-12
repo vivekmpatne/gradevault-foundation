@@ -10,6 +10,7 @@ import {
   Briefcase,
   ArrowUp,
   ArrowDown,
+  Info,
 } from "lucide-react";
 import {
   Card,
@@ -20,6 +21,12 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useStudent } from "@/lib/student-store";
 import { gradePointFromMarks } from "@/lib/calculator-storage";
 import { cn } from "@/lib/utils";
@@ -115,12 +122,12 @@ function SuggestionsPage() {
   const projScore = Math.min(25, (settings.projects / 5) * 25);
   const readiness = Math.round(cgpaScore + lcScore + cfScore + projScore);
   const readinessTone: Tone =
-    readiness >= 75 ? "good" : readiness >= 50 ? "warn" : "bad";
+    readiness >= 71 ? "good" : readiness >= 41 ? "warn" : "bad";
   const readinessLabel =
-    readiness >= 75
-      ? "Job Ready"
-      : readiness >= 50
-        ? "Getting There"
+    readiness >= 71
+      ? "Placement Ready"
+      : readiness >= 41
+        ? "Good Progress"
         : "Needs Work";
 
   return (
@@ -332,35 +339,116 @@ function SuggestionsPage() {
 
       {/* 5. Career Readiness */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Briefcase className="size-5" /> Career Readiness
-          </CardTitle>
-          <CardDescription>
-            Weighted from CGPA, LeetCode, Codeforces and project count.
-          </CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Briefcase className="size-5" /> Career Readiness
+            </CardTitle>
+            <CardDescription className="mt-1">
+              Weighted assessment of academic performance and technical profiles.
+            </CardDescription>
+          </div>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-full hover:bg-secondary">
+                  <Info className="size-5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs text-center p-3">
+                Increase projects and coding ratings to improve readiness score.
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-end justify-between">
-            <div>
-              <div className="text-4xl font-bold tabular-nums">
-                {readiness}%
+        <CardContent className="space-y-6">
+          <div className="grid md:grid-cols-2 gap-6 items-center">
+            {/* Left Column: Summary Circle / Progress */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="relative flex items-center justify-center size-24 rounded-full border-4 border-muted">
+                  <div className="absolute text-2xl font-bold tabular-nums">
+                    {readiness}%
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <div className="text-sm font-medium text-muted-foreground">Total Readiness</div>
+                  <Badge
+                    variant="outline"
+                    className={cn("text-sm px-2.5 py-0.5 font-semibold", toneClass(readinessTone))}
+                  >
+                    {readinessLabel}
+                  </Badge>
+                </div>
               </div>
-              <Badge
-                variant="outline"
-                className={cn("mt-2", toneClass(readinessTone))}
-              >
-                {readinessLabel}
-              </Badge>
+
+              {/* Status Ranges Legend */}
+              <div className="space-y-2 border-t pt-4">
+                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status Scale</div>
+                <div className="grid grid-cols-3 gap-2 text-xs">
+                  <div className="flex flex-col items-center p-1.5 rounded bg-red-500/5 border border-red-500/10 text-red-600 dark:text-red-400">
+                    <span className="font-bold">0-40</span>
+                    <span className="text-[10px]">Needs Work</span>
+                  </div>
+                  <div className="flex flex-col items-center p-1.5 rounded bg-amber-500/5 border border-amber-500/10 text-amber-600 dark:text-amber-400">
+                    <span className="font-bold">41-70</span>
+                    <span className="text-[10px]">Good Progress</span>
+                  </div>
+                  <div className="flex flex-col items-center p-1.5 rounded bg-emerald-500/5 border border-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                    <span className="font-bold">71-100</span>
+                    <span className="text-[10px]">Placement Ready</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="text-right text-xs text-muted-foreground space-y-0.5">
-              <div>CGPA · {cgpaScore.toFixed(0)}/40</div>
-              <div>LeetCode · {lcScore.toFixed(0)}/20</div>
-              <div>Codeforces · {cfScore.toFixed(0)}/15</div>
-              <div>Projects · {projScore.toFixed(0)}/25</div>
+
+            {/* Right Column: Scoring Breakdown */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium text-muted-foreground">Scoring Breakdown</h3>
+              <div className="space-y-3.5">
+                {/* CGPA Score */}
+                <div className="space-y-1">
+                  <div className="flex justify-between text-sm font-medium">
+                    <span>CGPA Score</span>
+                    <span className="tabular-nums font-semibold">{cgpaScore.toFixed(0)}/40</span>
+                  </div>
+                  <Progress value={(cgpaScore / 40) * 100} className="h-1.5" />
+                </div>
+
+                {/* LeetCode Score */}
+                <div className="space-y-1">
+                  <div className="flex justify-between text-sm font-medium">
+                    <span>LeetCode Score</span>
+                    <span className="tabular-nums font-semibold">{lcScore.toFixed(0)}/20</span>
+                  </div>
+                  <Progress value={(lcScore / 20) * 100} className="h-1.5" />
+                </div>
+
+                {/* Codeforces Score */}
+                <div className="space-y-1">
+                  <div className="flex justify-between text-sm font-medium">
+                    <span>Codeforces Score</span>
+                    <span className="tabular-nums font-semibold">{cfScore.toFixed(0)}/15</span>
+                  </div>
+                  <Progress value={(cfScore / 15) * 100} className="h-1.5" />
+                </div>
+
+                {/* Projects Score */}
+                <div className="space-y-1">
+                  <div className="flex justify-between text-sm font-medium">
+                    <span>Projects Score</span>
+                    <span className="tabular-nums font-semibold">{projScore.toFixed(0)}/25</span>
+                  </div>
+                  <Progress value={(projScore / 25) * 100} className="h-1.5" />
+                </div>
+              </div>
             </div>
           </div>
-          <Progress value={readiness} />
+
+          <div className="bg-muted/40 rounded-lg p-3 text-xs text-muted-foreground flex gap-2 items-start border">
+            <Info className="size-4 shrink-0 text-muted-foreground mt-0.5" />
+            <span>Increase projects and coding ratings to improve readiness score.</span>
+          </div>
         </CardContent>
       </Card>
     </div>
