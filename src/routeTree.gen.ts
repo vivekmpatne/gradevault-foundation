@@ -19,6 +19,7 @@ import { Route as AppReadinessRouteImport } from './routes/_app.readiness'
 import { Route as AppPlacementTrackerRouteImport } from './routes/_app.placement-tracker'
 import { Route as AppPlacementRouteImport } from './routes/_app.placement'
 import { Route as AppHistoryRouteImport } from './routes/_app.history'
+import { Route as AppFeedbackRouteImport } from './routes/_app.feedback'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppCalculatorRouteImport } from './routes/_app.calculator'
 
@@ -71,6 +72,11 @@ const AppHistoryRoute = AppHistoryRouteImport.update({
   path: '/history',
   getParentRoute: () => AppRoute,
 } as any)
+const AppFeedbackRoute = AppFeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/calculator': typeof AppCalculatorRoute
   '/dashboard': typeof AppDashboardRoute
+  '/feedback': typeof AppFeedbackRoute
   '/history': typeof AppHistoryRoute
   '/placement': typeof AppPlacementRoute
   '/placement-tracker': typeof AppPlacementTrackerRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/calculator': typeof AppCalculatorRoute
   '/dashboard': typeof AppDashboardRoute
+  '/feedback': typeof AppFeedbackRoute
   '/history': typeof AppHistoryRoute
   '/placement': typeof AppPlacementRoute
   '/placement-tracker': typeof AppPlacementTrackerRoute
@@ -114,6 +122,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/_app/calculator': typeof AppCalculatorRoute
   '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/feedback': typeof AppFeedbackRoute
   '/_app/history': typeof AppHistoryRoute
   '/_app/placement': typeof AppPlacementRoute
   '/_app/placement-tracker': typeof AppPlacementTrackerRoute
@@ -129,6 +138,7 @@ export interface FileRouteTypes {
     | '/'
     | '/calculator'
     | '/dashboard'
+    | '/feedback'
     | '/history'
     | '/placement'
     | '/placement-tracker'
@@ -142,6 +152,7 @@ export interface FileRouteTypes {
     | '/'
     | '/calculator'
     | '/dashboard'
+    | '/feedback'
     | '/history'
     | '/placement'
     | '/placement-tracker'
@@ -156,6 +167,7 @@ export interface FileRouteTypes {
     | '/_app'
     | '/_app/calculator'
     | '/_app/dashboard'
+    | '/_app/feedback'
     | '/_app/history'
     | '/_app/placement'
     | '/_app/placement-tracker'
@@ -243,6 +255,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppHistoryRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/feedback': {
+      id: '/_app/feedback'
+      path: '/feedback'
+      fullPath: '/feedback'
+      preLoaderRoute: typeof AppFeedbackRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/dashboard': {
       id: '/_app/dashboard'
       path: '/dashboard'
@@ -263,6 +282,7 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppCalculatorRoute: typeof AppCalculatorRoute
   AppDashboardRoute: typeof AppDashboardRoute
+  AppFeedbackRoute: typeof AppFeedbackRoute
   AppHistoryRoute: typeof AppHistoryRoute
   AppPlacementRoute: typeof AppPlacementRoute
   AppPlacementTrackerRoute: typeof AppPlacementTrackerRoute
@@ -276,6 +296,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppCalculatorRoute: AppCalculatorRoute,
   AppDashboardRoute: AppDashboardRoute,
+  AppFeedbackRoute: AppFeedbackRoute,
   AppHistoryRoute: AppHistoryRoute,
   AppPlacementRoute: AppPlacementRoute,
   AppPlacementTrackerRoute: AppPlacementTrackerRoute,
@@ -295,3 +316,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
