@@ -10,6 +10,7 @@ import {
   Briefcase,
   ArrowUp,
   ArrowDown,
+  Info,
 } from "lucide-react";
 import {
   Card,
@@ -20,6 +21,12 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useStudent } from "@/lib/student-store";
 import { gradePointFromMarks } from "@/lib/calculator-storage";
 import { cn } from "@/lib/utils";
