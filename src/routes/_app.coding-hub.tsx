@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Code2,
   Github,
@@ -13,6 +13,9 @@ import {
   Boxes,
   Calendar,
   Hash,
+  RefreshCw,
+  Lock,
+  Pencil,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -31,10 +34,18 @@ import { useStudent, updateSettings } from "@/lib/student-store";
 import { cn } from "@/lib/utils";
 import { GithubIntegrationPanel } from "@/components/github-integration-panel";
 import { DsaAnalyticsPanel } from "@/components/dsa-analytics-panel";
+import {
+  loadSyncMeta,
+  isSyncStale,
+  syncAll,
+  type SyncOutcome,
+  type SyncPlatform,
+} from "@/lib/coding-sync";
 
 export const Route = createFileRoute("/_app/coding-hub")({
   component: CodingHubPage,
 });
+
 
 function CodingHubPage() {
   const { settings } = useStudent();
