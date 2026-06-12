@@ -58,14 +58,15 @@ export function isFresh(s: { fetchedAt: number } | null): boolean {
   return !!s && Date.now() - s.fetchedAt < TTL;
 }
 
+import { fetchLeetCodeStats } from "./leetcode.functions";
+
 export async function fetchLeetCode(username: string): Promise<LeetCodeStats> {
   const clean = username.trim().replace(/^@/, "");
   if (!clean) throw new Error("LeetCode username is required");
 
-  // Use our server function so we bypass LeetCode's CORS restriction
-  // (the previous community proxy at leetcode-stats-api.herokuapp.com is
-  // frequently down and was the source of the "Failed to fetch" badge).
-  const { fetchLeetCodeStats } = await import("./leetcode.functions");
+  // Server function proxies LeetCode's GraphQL endpoint, side-stepping
+  // browser CORS and the previously-flaky community proxy that produced
+  // "Failed to fetch" on production.
   let server;
   try {
     server = await fetchLeetCodeStats({ data: { username: clean } });
