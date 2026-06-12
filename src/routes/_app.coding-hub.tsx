@@ -258,6 +258,13 @@ function CodingHubPage() {
       {/* GitHub Integration (live) */}
       <GithubIntegrationPanel username={settings.githubUsername} />
 
+      {/* DSA Analytics (LeetCode + Codeforces) */}
+      <DsaAnalyticsPanel
+        leetcodeUsername={settings.leetcodeUsername}
+        codeforcesHandle={settings.codeforcesHandle}
+      />
+
+
 
 
       {/* 2. Coding Progress */}
