@@ -43,9 +43,6 @@ export const SEED_STUDENTS: Student[] = (studentsData as Student[]).map((s) => (
   source: "seed",
 }));
 
-// Back-compat alias
-export const STUDENTS = SEED_STUDENTS;
-
 function emitStudentsChanged() {
   if (typeof window === "undefined") return;
   window.dispatchEvent(new Event(STUDENTS_EVENT));
@@ -241,35 +238,5 @@ export const DEMO_ACCOUNT = {
   usn: DEMO_ACCOUNT_USN,
 };
 
-// ===== Academic helpers =====
+// Academic helpers moved to src/lib/academic-store.ts (single source of truth).
 
-export function computeCGPA(semesters: Semester[]): number {
-  if (semesters.length === 0) return 0;
-  const totalCredits = semesters.reduce((s, x) => s + x.credits, 0);
-  if (totalCredits === 0) return 0;
-  const weighted = semesters.reduce((s, x) => s + x.sgpa * x.credits, 0);
-  return weighted / totalCredits;
-}
-
-export function totalCredits(semesters: Semester[]): number {
-  return semesters.reduce((s, x) => s + x.credits, 0);
-}
-
-export function latestSGPA(semesters: Semester[]): number {
-  if (semesters.length === 0) return 0;
-  return [...semesters].sort((a, b) => b.number - a.number)[0].sgpa;
-}
-
-export function cgpaToPercentage(cgpa: number): number {
-  return (cgpa - 0.75) * 10;
-}
-
-export function academicStatus(cgpa: number): {
-  label: string;
-  tone: "excellent" | "good" | "average" | "low";
-} {
-  if (cgpa >= 8.5) return { label: "Excellent", tone: "excellent" };
-  if (cgpa >= 8.0) return { label: "Good", tone: "good" };
-  if (cgpa >= 7.0) return { label: "Average", tone: "average" };
-  return { label: "Needs Improvement", tone: "low" };
-}

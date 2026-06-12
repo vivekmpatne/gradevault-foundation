@@ -40,7 +40,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { deleteSemester, useAcademicData } from "@/lib/academic-store";
+import { deleteSemester } from "@/lib/academic-store";
+import { useStudent, useAcademicData } from "@/lib/student-store";
 import { EmptyState } from "@/components/empty-state";
 import { gradePointFromMarks } from "@/lib/calculator-storage";
 
@@ -52,7 +53,8 @@ const FOCUS_KEY = "gradevault_calc_focus";
 
 function HistoryPage() {
   const navigate = useNavigate();
-  const { student, semesters, cgpa, totalCredits, hasData } = useAcademicData();
+  const { academic } = useStudent();
+  const { student, semesters, cgpa, totalCredits, hasData } = academic;
   const [query, setQuery] = useState("");
   const [sortAsc, setSortAsc] = useState(true);
   const [expanded, setExpanded] = useState<Set<number>>(new Set());

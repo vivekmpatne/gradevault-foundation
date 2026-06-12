@@ -37,11 +37,9 @@ import {
   type Student,
 } from "@/lib/auth";
 import {
-  DEFAULT_SETTINGS,
-  loadSettings,
-  saveSettings,
   type PrepTrack,
 } from "@/lib/settings-store";
+import { updateSettings } from "@/lib/student-store";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -131,8 +129,7 @@ function LoginPage() {
   };
 
   const handleFinishOnboarding = () => {
-    const current = loadSettings();
-    saveSettings({ ...DEFAULT_SETTINGS, ...current, prepTrack });
+    updateSettings({ prepTrack });
     setOnboardOpen(false);
     navigate({ to: "/dashboard" });
   };
