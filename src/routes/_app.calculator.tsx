@@ -72,8 +72,15 @@ function CalculatorPage() {
     setStudent(s);
     const all = loadAllSemesters();
     setSaved(all);
-    // Default to the centrally-derived current semester so all tabs agree.
-    const initial = String(academic.currentSemester || 1);
+    // Honor an Edit hand-off from History; otherwise use the derived current sem.
+    let initial = String(academic.currentSemester || 1);
+    if (typeof window !== "undefined") {
+      const focus = sessionStorage.getItem("gradevault_calc_focus");
+      if (focus) {
+        initial = focus;
+        sessionStorage.removeItem("gradevault_calc_focus");
+      }
+    }
     setSelected(initial);
     loadInto(initial, all, s);
   }, [navigate]);
