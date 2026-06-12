@@ -36,7 +36,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { clearSession, getCurrentStudent, getSession } from "@/lib/auth";
+import {
+  clearSession,
+  getCurrentStudent,
+  getSession,
+  isLocalStudent,
+  updateLocalStudent,
+} from "@/lib/auth";
 import { useStudent } from "@/lib/student-store";
 import {
   DEFAULT_SETTINGS,
