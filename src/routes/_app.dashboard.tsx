@@ -11,6 +11,9 @@ import {
   IdCard,
   LineChart as LineChartIcon,
   Calculator as CalculatorIcon,
+  ArrowUpRight,
+  ArrowDownRight,
+  ArrowRight,
 } from "lucide-react";
 import {
   Card,
@@ -35,7 +38,14 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
-import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
+import {
+  CartesianGrid,
+  LabelList,
+  Line,
+  LineChart,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { useAcademicData } from "@/lib/academic-store";
 
 export const Route = createFileRoute("/_app/dashboard")({
@@ -43,11 +53,16 @@ export const Route = createFileRoute("/_app/dashboard")({
 });
 
 const chartConfig = {
-  sgpa: {
-    label: "SGPA",
-    color: "hsl(var(--primary))",
-  },
+  sgpa: { label: "SGPA", color: "hsl(var(--primary))" },
+  projected: { label: "Projection", color: "hsl(var(--muted-foreground))" },
 } satisfies ChartConfig;
+
+function sgpaColor(v: number): string {
+  if (v >= 9) return "#10B981";
+  if (v >= 8) return "#2563EB";
+  if (v >= 7) return "#F59E0B";
+  return "#EF4444";
+}
 
 function DashboardPage() {
   const navigate = useNavigate();
@@ -80,10 +95,54 @@ function DashboardPage() {
     low: "bg-destructive/15 text-destructive border-destructive/30",
   };
 
-  const chartData = semesters.map((s) => ({
-    semester: `Sem ${s.number}`,
-    sgpa: Number(s.sgpa.toFixed(2)),
-  }));
+  const completed = semesters.filter((s) => s.completed);
+  const lastCompletedNum = completed.length
+    ? completed[completed.length - 1].number
+    : 0;
+  const projectedY = completed.length
+    ? Number(completed[completed.length - 1].sgpa.toFixed(2))
+    : null;
+
+  // Build a continuous 1..8 timeline so projection lines render past the last
+  // completed semester.
+  const chartData = Array.from({ length: 8 }, (_, i) => {
+    const num = i + 1;
+    const sem = semesters.find((s) => s.number === num);
+    const sgpa =
+      sem && sem.completed ? Number(sem.sgpa.toFixed(2)) : null;
+    let projected: number | null = null;
+    if (projectedY !== null && num >= lastCompletedNum && num <= 8) {
+      projected = projectedY;
+    }
+    return { semester: `Sem ${num}`, sgpa, projected };
+  });
+
+  // Trend: compare last two completed SGPAs.
+  let trend: "improving" | "stable" | "declining" = "stable";
+  if (completed.length >= 2) {
+    const diff =
+      completed[completed.length - 1].sgpa -
+      completed[completed.length - 2].sgpa;
+    if (diff > 0.1) trend = "improving";
+    else if (diff < -0.1) trend = "declining";
+  }
+  const trendMeta = {
+    improving: {
+      label: "Improving",
+      Icon: ArrowUpRight,
+      cls: "bg-emerald-500/15 text-emerald-600 border-emerald-500/30",
+    },
+    stable: {
+      label: "Stable",
+      Icon: ArrowRight,
+      cls: "bg-blue-500/15 text-blue-600 border-blue-500/30",
+    },
+    declining: {
+      label: "Declining",
+      Icon: ArrowDownRight,
+      cls: "bg-destructive/15 text-destructive border-destructive/30",
+    },
+  }[trend];
 
   const stats = [
     {
@@ -223,25 +282,40 @@ function DashboardPage() {
           </div>
 
           <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <LineChartIcon className="size-4 text-muted-foreground" />
-                <CardTitle>SGPA Trend</CardTitle>
+            <CardHeader className="flex flex-row items-start justify-between gap-3 space-y-0">
+              <div>
+                <div className="flex items-center gap-2">
+                  <LineChartIcon className="size-4 text-muted-foreground" />
+                  <CardTitle>SGPA Trend</CardTitle>
+                </div>
+                <CardDescription className="mt-1">
+                  Semester-wise SGPA across completed terms.
+                </CardDescription>
               </div>
-              <CardDescription>
-                Semester-wise SGPA across completed terms.
-              </CardDescription>
+              {completed.length >= 2 && (
+                <Badge
+                  variant="outline"
+                  className={`${trendMeta.cls} gap-1`}
+                >
+                  <trendMeta.Icon className="size-3.5" />
+                  {trendMeta.label}
+                </Badge>
+              )}
             </CardHeader>
             <CardContent>
               <ChartContainer
                 config={chartConfig}
-                className="h-[280px] w-full"
+                className="h-[300px] sm:h-[340px] w-full"
               >
                 <LineChart
                   data={chartData}
-                  margin={{ top: 8, right: 16, bottom: 8, left: 0 }}
+                  margin={{ top: 24, right: 24, bottom: 8, left: 0 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="hsl(var(--border))"
+                  />
                   <XAxis
                     dataKey="semester"
                     tickLine={false}
@@ -256,18 +330,72 @@ function DashboardPage() {
                     width={32}
                   />
                   <ChartTooltip content={<ChartTooltipContent />} />
+                  {/* Future projection — dashed grey line */}
+                  <Line
+                    type="monotone"
+                    dataKey="projected"
+                    stroke="hsl(var(--muted-foreground))"
+                    strokeWidth={2}
+                    strokeDasharray="6 6"
+                    dot={false}
+                    activeDot={false}
+                    connectNulls
+                    isAnimationActive
+                    animationDuration={900}
+                  />
+                  {/* Actual SGPA — colored dots per threshold */}
                   <Line
                     type="monotone"
                     dataKey="sgpa"
-                    stroke="var(--color-sgpa)"
-                    strokeWidth={2}
-                    dot={{ r: 4 }}
-                    activeDot={{ r: 6 }}
-                  />
+                    stroke="hsl(var(--primary))"
+                    strokeWidth={2.5}
+                    connectNulls
+                    isAnimationActive
+                    animationDuration={900}
+                    dot={(props) => {
+                      const { cx, cy, payload, index } = props;
+                      if (
+                        cx == null ||
+                        cy == null ||
+                        payload?.sgpa == null
+                      )
+                        return <g key={`d-${index}`} />;
+                      return (
+                        <circle
+                          key={`d-${index}`}
+                          cx={cx}
+                          cy={cy}
+                          r={5}
+                          fill={sgpaColor(payload.sgpa)}
+                          stroke="hsl(var(--background))"
+                          strokeWidth={2}
+                        />
+                      );
+                    }}
+                    activeDot={{ r: 7 }}
+                  >
+                    <LabelList
+                      dataKey="sgpa"
+                      position="top"
+                      offset={10}
+                      className="fill-foreground text-[11px] font-medium"
+                      formatter={(v: number | null) =>
+                        v == null ? "" : v.toFixed(2)
+                      }
+                    />
+                  </Line>
                 </LineChart>
               </ChartContainer>
+              <div className="mt-3 flex flex-wrap gap-3 text-xs text-muted-foreground">
+                <LegendDot color="#10B981" label="≥ 9.0" />
+                <LegendDot color="#2563EB" label="8.0 – 8.99" />
+                <LegendDot color="#F59E0B" label="7.0 – 7.99" />
+                <LegendDot color="#EF4444" label="< 7.0" />
+                <LegendDot color="hsl(var(--muted-foreground))" label="Projection" dashed />
+              </div>
             </CardContent>
           </Card>
+
 
           <Card>
             <CardHeader>
@@ -318,5 +446,32 @@ function ProfileField({ label, value }: { label: string; value: string }) {
       </dt>
       <dd className="font-medium mt-1">{value}</dd>
     </div>
+  );
+}
+
+function LegendDot({
+  color,
+  label,
+  dashed,
+}: {
+  color: string;
+  label: string;
+  dashed?: boolean;
+}) {
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      {dashed ? (
+        <span
+          className="inline-block w-4 border-t-2 border-dashed"
+          style={{ borderColor: color }}
+        />
+      ) : (
+        <span
+          className="inline-block size-2.5 rounded-full"
+          style={{ backgroundColor: color }}
+        />
+      )}
+      {label}
+    </span>
   );
 }
