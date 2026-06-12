@@ -39,7 +39,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getCurrentStudent, type Student } from "@/lib/auth";
+import { type Student } from "@/lib/auth";
 import {
   AlertDialog,
   AlertDialogAction,
