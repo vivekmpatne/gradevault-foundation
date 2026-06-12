@@ -455,6 +455,7 @@ function ProfileCard() {
     graduationYear: "",
   });
 
+  const usn = student?.profile.usn;
   useEffect(() => {
     if (!student) return;
     setPf({
@@ -467,7 +468,9 @@ function ProfileCard() {
         ? String(student.profile.graduationYear)
         : "",
     });
-  }, [student, editing]);
+    // student object identity changes every render; key effect on usn + editing
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usn, editing]);
 
   if (!student) return null;
 
