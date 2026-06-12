@@ -1,5 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import {
   GraduationCap,
   Code2,
@@ -19,46 +18,62 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  loadSnapshot,
-  type PublicProfileSnapshot,
-} from "@/lib/public-profile-store";
+import { getPublicProfileSnapshot } from "@/lib/public-profile.functions";
+import type { PublicProfileSnapshot } from "@/lib/public-profile-store";
 
 export const Route = createFileRoute("/u/$username")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `@${params.username} — GradeVault` },
-      {
-        name: "description",
-        content: `Public Career OS profile for ${params.username} on GradeVault.`,
-      },
-      { property: "og:title", content: `@${params.username} on GradeVault` },
-      {
-        property: "og:description",
-        content: "Student Career OS: academics, coding, and placements.",
-      },
-    ],
-  }),
+  loader: async ({ params }) => {
+    try {
+      const res = await getPublicProfileSnapshot({
+        data: { username: params.username.toLowerCase() },
+      });
+      return { snapshot: res.snapshot, updatedAt: res.updatedAt };
+    } catch {
+      return { snapshot: null, updatedAt: null };
+    }
+  },
+  head: ({ loaderData, params }) => {
+    const snap = loaderData?.snapshot as PublicProfileSnapshot | null | undefined;
+    const handle = params.username;
+    if (!snap) {
+      return {
+        meta: [
+          { title: `@${handle} — GradeVault` },
+          {
+            name: "description",
+            content: `Public Career OS profile for @${handle} on GradeVault.`,
+          },
+        ],
+      };
+    }
+    const desc = `${snap.displayName} · ${snap.branch ?? "Student"} · CGPA ${snap.cgpa.toFixed(2)} · Sem ${snap.currentSemester}`;
+    return {
+      meta: [
+        { title: `${snap.displayName} (@${snap.username}) — GradeVault` },
+        { name: "description", content: desc },
+        { property: "og:title", content: `${snap.displayName} on GradeVault` },
+        { property: "og:description", content: desc },
+        { property: "og:type", content: "profile" },
+        { name: "twitter:card", content: "summary" },
+        { name: "twitter:title", content: `${snap.displayName} on GradeVault` },
+        { name: "twitter:description", content: desc },
+      ],
+    };
+  },
   component: PublicProfilePage,
+  errorComponent: () => (
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <p className="text-muted-foreground">
+        Couldn't load this profile. Try again later.
+      </p>
+    </div>
+  ),
 });
 
 function PublicProfilePage() {
+  const { snapshot: snap } = Route.useLoaderData();
   const { username } = Route.useParams();
-  const [snap, setSnap] = useState<PublicProfileSnapshot | null | undefined>(
-    undefined,
-  );
-
-  useEffect(() => {
-    setSnap(loadSnapshot(username));
-  }, [username]);
-
-  if (snap === undefined) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-6">
-        <p className="text-muted-foreground text-sm">Loading…</p>
-      </div>
-    );
-  }
+  const router = useRouter();
 
   if (!snap) {
     return (
@@ -72,14 +87,19 @@ function PublicProfilePage() {
               <h1 className="text-xl font-semibold">Profile not found</h1>
               <p className="text-sm text-muted-foreground mt-1">
                 <span className="font-mono">@{username}</span> hasn't published
-                a public Career OS profile on this device.
+                a public Career OS profile yet.
               </p>
             </div>
-            <Button asChild variant="outline">
-              <Link to="/">
-                <ArrowLeft className="size-4" /> Back to GradeVault
-              </Link>
-            </Button>
+            <div className="flex gap-2 justify-center">
+              <Button asChild variant="outline">
+                <Link to="/">
+                  <ArrowLeft className="size-4" /> Back to GradeVault
+                </Link>
+              </Button>
+              <Button variant="outline" onClick={() => router.invalidate()}>
+                Retry
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -101,7 +121,6 @@ function PublicProfilePage() {
           </Badge>
         </div>
 
-        {/* Identity */}
         <Card>
           <CardHeader className="flex flex-row items-start gap-4 space-y-0">
             <div className="size-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
@@ -127,7 +146,6 @@ function PublicProfilePage() {
           </CardHeader>
         </Card>
 
-        {/* Pillars */}
         <div className="grid gap-4 sm:grid-cols-3">
           <PillarCard
             icon={GraduationCap}
@@ -162,7 +180,6 @@ function PublicProfilePage() {
           />
         </div>
 
-        {/* Links */}
         {(snap.coding.githubUsername ||
           snap.coding.leetcodeUsername ||
           snap.coding.codeforcesHandle ||
