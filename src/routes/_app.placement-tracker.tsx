@@ -125,6 +125,8 @@ function PlacementTrackerPage() {
   const [form, setForm] = useState<FormState>(emptyForm());
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [view, setView] = useState<"list" | "board">("list");
+  const [draggingId, setDraggingId] = useState<string | null>(null);
 
   const companies = useMemo(
     () => Array.from(new Set(apps.map((a) => a.company))).sort(),
