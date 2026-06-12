@@ -253,6 +253,11 @@ function CodingHubPage() {
         </CardContent>
       </Card>
 
+      {/* GitHub Integration (live) */}
+      <GithubIntegrationPanel username={settings.githubUsername} />
+
+
+
       {/* 2. Coding Progress */}
       <Card>
         <CardHeader>
