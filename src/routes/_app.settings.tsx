@@ -50,7 +50,6 @@ import {
   DEFAULT_SETTINGS,
   loadSettings,
   loadTheme,
-  saveSettings,
   setTheme as persistTheme,
   type PrepTrack,
   type StudentSettings,
@@ -67,9 +66,9 @@ const CALC_PREFIX = "gradevault_calc_";
 
 function SettingsPage() {
   const navigate = useNavigate();
-  const student = getCurrentStudent();
+  const { academic, settings } = useStudent();
+  const student = academic.student;
   const session = getSession();
-  useStudent(); // subscribe so this page re-renders when academic data updates
   const [form, setForm] = useState<StudentSettings>(DEFAULT_SETTINGS);
   const [theme, setThemeMode] = useState<ThemeMode>("light");
   const [confirmClear, setConfirmClear] = useState(false);
@@ -81,9 +80,9 @@ function SettingsPage() {
       navigate({ to: "/" });
       return;
     }
-    setForm(loadSettings());
+    setForm(settings);
     setThemeMode(loadTheme());
-  }, [usn, navigate]);
+  }, [usn, navigate, settings]);
 
   if (!student || !session) return null;
 
@@ -103,7 +102,7 @@ function SettingsPage() {
       toast.error("Target CGPA must be between 0 and 10");
       return;
     }
-    saveSettings(form);
+    updateSettings(form);
     toast.success("Settings saved");
   }
 
