@@ -3,8 +3,9 @@
  *
  * Every tab (Dashboard, Calculator, History, Settings, Suggestions,
  * Placement, Placement Tracker, Readiness, Strategy, Coding Hub, Roadmap,
- * Upload Marks, Feedback) reads from `useStudent()` so a change in one
- * place propagates everywhere via the underlying event bus.
+ * Upload Marks, Feedback) reads from `useStudent()` and writes through
+ * `updateSettings()` / `updateProfile()`, so a change in one place
+ * propagates everywhere via the underlying event bus.
  *
  * Backed by LocalStorage via the academic + settings + readiness +
  * placement-tracker stores.
@@ -12,12 +13,23 @@
 import { useMemo } from "react";
 import { useAcademicData, type AcademicData } from "@/lib/academic-store";
 import {
+  loadSettings,
+  saveSettings as persistSettings,
   useSettings,
   type StudentSettings,
   type ThemeMode,
 } from "@/lib/settings-store";
 import { useReadiness, type ReadinessInputs } from "@/lib/readiness-store";
-import { useApplications } from "@/lib/placement-tracker-store";
+import {
+  useApplications,
+  type Application,
+} from "@/lib/placement-tracker-store";
+import {
+  getSession,
+  saveSession,
+  updateLocalStudent,
+  type NewStudentInput,
+} from "@/lib/auth";
 
 export type ProfileCompletion = {
   total: number; // 0..100
@@ -47,7 +59,7 @@ function computeProfileCompletion(
   if (p?.college) basicInfo += 3; else missing.push("College");
   if (p?.graduationYear) basicInfo += 3; else missing.push("Graduation year");
 
-  // Academic — 20 pts (have at least one completed semester)
+  // Academic — 20 pts
   let academicScore = 0;
   if (academic.completedSemesters >= 1) academicScore += 10;
   if (academic.completedSemesters >= 3) academicScore += 5;
@@ -55,7 +67,7 @@ function computeProfileCompletion(
   if (academic.completedSemesters === 0)
     missing.push("Add at least one semester");
 
-  // Coding profiles — 20 pts (4 profiles, 5 pts each)
+  // Coding profiles — 20 pts
   let coding = 0;
   if (settings.githubUsername) coding += 5; else missing.push("GitHub username");
   if (settings.leetcodeUsername) coding += 5; else missing.push("LeetCode username");
@@ -94,6 +106,7 @@ export type StudentStore = {
   settings: StudentSettings;
   theme: ThemeMode;
   readiness: ReadinessInputs;
+  applications: Application[];
   applicationsCount: number;
   profileCompletion: ProfileCompletion;
 };
@@ -114,9 +127,53 @@ export function useStudent(): StudentStore {
     settings,
     theme,
     readiness,
+    applications,
     applicationsCount: applications.length,
     profileCompletion,
   };
+}
+
+// ----- Unified write helpers -----
+
+/** Patch any subset of settings; fires SETTINGS_EVENT so every consumer
+ *  re-renders without a reload. */
+export function updateSettings(patch: Partial<StudentSettings>): void {
+  persistSettings({ ...loadSettings(), ...patch });
+}
+
+/** Patch the local student profile (name, branch, semester, college, …).
+ *  Demo (seed) accounts return `{ ok: false }`. */
+export function updateProfile(
+  patch: Partial<NewStudentInput>,
+): { ok: boolean; error?: string } {
+  const session = getSession();
+  if (!session) return { ok: false, error: "Not signed in" };
+  const res = updateLocalStudent(session.usn, patch);
+  if (res.ok && res.student) {
+    // Keep session ref in sync (name may have changed).
+    saveSession(res.student);
+  }
+  return { ok: res.ok, error: res.error };
+}
+
+// Re-exports so consumers only need this one module.
+export { useAcademicData } from "@/lib/academic-store";
+export {
+  useSettings,
+  setTheme,
+  loadSettings,
+  loadTheme,
+  applyTheme,
+  DEFAULT_SETTINGS,
+} from "@/lib/settings-store";
+export { useApplications } from "@/lib/placement-tracker-store";
+export type { AcademicData } from "@/lib/academic-store";
+export type {
+  StudentSettings,
+  PrepTrack,
+  ThemeMode,
+} from "@/lib/settings-store";
+
 }
 
 // Re-exports so consumers only need this one module.
