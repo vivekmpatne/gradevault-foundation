@@ -14,6 +14,7 @@ import {
   Gauge,
   Compass,
   MessageSquare,
+  Code2,
 } from "lucide-react";
 import {
   Sidebar,
@@ -40,6 +41,7 @@ const items = [
   { title: "Placement Tracker", url: "/placement-tracker", icon: ClipboardList },
   { title: "Readiness Score", url: "/readiness", icon: Gauge },
   { title: "Strategy Advisor", url: "/strategy", icon: Compass },
+  { title: "Coding Hub", url: "/coding-hub", icon: Code2 },
   { title: "Roadmap", url: "/roadmap", icon: Map },
   { title: "Feedback", url: "/feedback", icon: MessageSquare },
   { title: "Settings", url: "/settings", icon: Settings },

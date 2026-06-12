@@ -15,6 +15,17 @@ export type StudentSettings = {
   projects: number;
   github: string;
   linkedin: string;
+  // Coding Profile Hub
+  codolioUrl: string;
+  githubUsername: string;
+  leetcodeUsername: string;
+  codeforcesHandle: string;
+  totalProblemsSolved: number;
+  contestCount: number;
+  currentStreak: number;
+  githubRepos: number;
+  openSourceContributions: number;
+  activeDevDays: number;
 };
 
 export const DEFAULT_SETTINGS: StudentSettings = {
@@ -28,6 +39,16 @@ export const DEFAULT_SETTINGS: StudentSettings = {
   projects: 0,
   github: "",
   linkedin: "",
+  codolioUrl: "",
+  githubUsername: "",
+  leetcodeUsername: "",
+  codeforcesHandle: "",
+  totalProblemsSolved: 0,
+  contestCount: 0,
+  currentStreak: 0,
+  githubRepos: 0,
+  openSourceContributions: 0,
+  activeDevDays: 0,
 };
 
 const SETTINGS_PREFIX = "gradevault_settings_";
