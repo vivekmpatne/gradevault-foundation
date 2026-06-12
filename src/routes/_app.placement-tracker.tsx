@@ -256,9 +256,29 @@ function PlacementTrackerPage() {
             Track every internship and placement application in one place.
           </p>
         </div>
-        <Button onClick={openAdd} className="self-start sm:self-auto">
-          <Plus className="size-4" /> Add Application
-        </Button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <div className="inline-flex rounded-md border p-0.5">
+            <Button
+              size="sm"
+              variant={view === "list" ? "secondary" : "ghost"}
+              onClick={() => setView("list")}
+              className="h-7 gap-1.5"
+            >
+              <ListIcon className="size-3.5" /> List
+            </Button>
+            <Button
+              size="sm"
+              variant={view === "board" ? "secondary" : "ghost"}
+              onClick={() => setView("board")}
+              className="h-7 gap-1.5"
+            >
+              <LayoutGrid className="size-3.5" /> Board
+            </Button>
+          </div>
+          <Button onClick={openAdd}>
+            <Plus className="size-4" /> Add Application
+          </Button>
+        </div>
       </div>
 
       {/* Dashboard Cards */}
