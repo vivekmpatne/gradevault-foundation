@@ -137,18 +137,10 @@ export function computeAcademicData(): AcademicData {
     semesters.length > 0 ? semesters[semesters.length - 1].number : 0;
   const latest = semesters[semesters.length - 1];
 
-  let currentSemester: number;
-  if (latest && !latest.completed) {
-    // Rule 3: in-progress latest semester IS the current semester.
-    currentSemester = latest.number;
-  } else {
-    // Rule 2: all completed → next semester.
-    currentSemester = Math.min(8, completedSemesters + 1);
-  }
-  // Rule 5: current can never be less than completed count.
-  if (currentSemester < completedSemesters) {
-    currentSemester = Math.min(8, completedSemesters);
-  }
+  // Current Semester = highest semester number present in history.
+  // Falls back to 1 when there is no history yet.
+  const currentSemester =
+    latestSemesterNumber > 0 ? latestSemesterNumber : 1;
 
   const totalCredits = completedList.reduce((a, s) => a + s.credits, 0);
   const weighted = completedList.reduce((a, s) => a + s.sgpa * s.credits, 0);
