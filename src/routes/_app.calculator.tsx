@@ -11,8 +11,8 @@ import { toast } from "sonner";
 import {
   deleteSemester as deleteSavedSemester,
   emitAcademicChange,
-  useAcademicData,
 } from "@/lib/academic-store";
+import { useStudent } from "@/lib/student-store";
 import {
   Card,
   CardContent,
