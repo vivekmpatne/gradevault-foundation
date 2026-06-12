@@ -14,7 +14,9 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   ArrowRight,
+  Download,
 } from "lucide-react";
+import { exportDashboardPdf } from "@/lib/pdf-export";
 import {
   Card,
   CardContent,
