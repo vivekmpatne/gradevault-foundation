@@ -448,3 +448,30 @@ function ProfileField({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
+function LegendDot({
+  color,
+  label,
+  dashed,
+}: {
+  color: string;
+  label: string;
+  dashed?: boolean;
+}) {
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      {dashed ? (
+        <span
+          className="inline-block w-4 border-t-2 border-dashed"
+          style={{ borderColor: color }}
+        />
+      ) : (
+        <span
+          className="inline-block size-2.5 rounded-full"
+          style={{ backgroundColor: color }}
+        />
+      )}
+      {label}
+    </span>
+  );
+}
