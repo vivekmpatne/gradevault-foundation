@@ -40,10 +40,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   clearSession,
-  getCurrentStudent,
   getSession,
   isLocalStudent,
-  updateLocalStudent,
 } from "@/lib/auth";
 import { useStudent, updateSettings, updateProfile } from "@/lib/student-store";
 import {
