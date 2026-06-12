@@ -37,6 +37,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { clearSession, getCurrentStudent, getSession } from "@/lib/auth";
+import { useStudent } from "@/lib/student-store";
 import {
   DEFAULT_SETTINGS,
   loadSettings,
@@ -59,6 +60,7 @@ function SettingsPage() {
   const navigate = useNavigate();
   const student = getCurrentStudent();
   const session = getSession();
+  const { academic } = useStudent();
   const [form, setForm] = useState<StudentSettings>(DEFAULT_SETTINGS);
   const [theme, setThemeMode] = useState<ThemeMode>("light");
   const [confirmClear, setConfirmClear] = useState(false);
@@ -186,7 +188,7 @@ function SettingsPage() {
             <Field label="University" value="VTU" />
             <Field
               label="Current Semester"
-              value={`Sem ${student.profile.currentSemester}`}
+              value={`Sem ${academic.currentSemester}`}
             />
           </dl>
         </CardContent>
