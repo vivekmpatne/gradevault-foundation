@@ -383,7 +383,8 @@ function PlacementTrackerPage() {
         </CardContent>
       </Card>
 
-      {/* List */}
+      {/* List view */}
+      {view === "list" && (
       <Card>
         <CardHeader>
           <CardTitle>Applications</CardTitle>
