@@ -9,6 +9,10 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import {
+  deleteSemester as deleteSavedSemester,
+  emitAcademicChange,
+} from "@/lib/academic-store";
+import {
   Card,
   CardContent,
   CardDescription,
@@ -171,6 +175,7 @@ function CalculatorPage() {
       const all = { ...saved, [next]: sem };
       setSaved(all);
       setSelected(String(next));
+      emitAcademicChange();
       toast.success(`Saved as Semester ${next}`);
       return;
     }
@@ -178,7 +183,23 @@ function CalculatorPage() {
     const sem: CalcSemester = { number: num, subjects, updatedAt: Date.now() };
     saveSemester(sem);
     setSaved({ ...saved, [num]: sem });
+    emitAcademicChange();
     toast.success(`Semester ${num} saved`);
+  }
+
+  function handleDelete() {
+    if (selected === NEW_SEM) return;
+    const num = Number(selected);
+    if (!saved[num]) {
+      toast("Nothing saved to delete");
+      return;
+    }
+    deleteSavedSemester(num);
+    const next = { ...saved };
+    delete next[num];
+    setSaved(next);
+    setSubjects([newSubject()]);
+    toast.success(`Semester ${num} deleted`);
   }
 
   function handleClear() {
@@ -421,6 +442,12 @@ function CalculatorPage() {
           )}
 
           <div className="flex flex-wrap gap-2 justify-end pt-2 border-t">
+            {selected !== NEW_SEM && saved[Number(selected)] && (
+              <Button variant="ghost" onClick={handleDelete}>
+                <Trash2 className="size-4" />
+                Delete Semester
+              </Button>
+            )}
             <Button variant="outline" onClick={handleClear}>
               <Eraser className="size-4" />
               Clear Draft

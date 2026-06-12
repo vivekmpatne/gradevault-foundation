@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   GraduationCap,
   TrendingUp,
@@ -35,22 +35,8 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
-import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  XAxis,
-  YAxis,
-} from "recharts";
-import {
-  getCurrentStudent,
-  computeCGPA,
-  totalCredits,
-  latestSGPA,
-  cgpaToPercentage,
-  academicStatus,
-  type Student,
-} from "@/lib/auth";
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
+import { useAcademicData } from "@/lib/academic-store";
 
 export const Route = createFileRoute("/_app/dashboard")({
   component: DashboardPage,
@@ -65,26 +51,24 @@ const chartConfig = {
 
 function DashboardPage() {
   const navigate = useNavigate();
-  const [student, setStudent] = useState<Student | null>(null);
+  const data = useAcademicData();
 
   useEffect(() => {
-    const s = getCurrentStudent();
-    if (!s) {
-      navigate({ to: "/" });
-      return;
-    }
-    setStudent(s);
-  }, [navigate]);
+    if (!data.student) navigate({ to: "/" });
+  }, [data.student, navigate]);
 
-  if (!student) return null;
+  if (!data.student) return null;
 
-  const hasData = student.semesters.length > 0;
-  const cgpa = computeCGPA(student.semesters);
-  const sgpa = latestSGPA(student.semesters);
-  const credits = totalCredits(student.semesters);
-  const percentage = cgpaToPercentage(cgpa);
-  const status = academicStatus(cgpa);
-  const completed = student.semesters.length;
+  const {
+    student,
+    semesters,
+    cgpa,
+    latestSgpa,
+    totalCredits,
+    percentage,
+    status,
+    hasData,
+  } = data;
 
   const statusToneClass: Record<typeof status.tone, string> = {
     excellent: "bg-emerald-500/15 text-emerald-600 border-emerald-500/30",
@@ -93,11 +77,7 @@ function DashboardPage() {
     low: "bg-destructive/15 text-destructive border-destructive/30",
   };
 
-  const sortedSemesters = [...student.semesters].sort(
-    (a, b) => a.number - b.number,
-  );
-
-  const chartData = sortedSemesters.map((s) => ({
+  const chartData = semesters.map((s) => ({
     semester: `Sem ${s.number}`,
     sgpa: Number(s.sgpa.toFixed(2)),
   }));
@@ -111,13 +91,15 @@ function DashboardPage() {
     },
     {
       label: "Latest SGPA",
-      value: hasData ? sgpa.toFixed(2) : "—",
+      value: hasData ? latestSgpa.toFixed(2) : "—",
       icon: Sparkles,
-      hint: hasData ? `Semester ${completed}` : "No data yet",
+      hint: hasData
+        ? `Semester ${semesters[semesters.length - 1].number}`
+        : "No data yet",
     },
     {
       label: "Credits Completed",
-      value: hasData ? String(credits) : "—",
+      value: hasData ? String(totalCredits) : "—",
       icon: Award,
       hint: "Total earned credits",
     },
@@ -144,7 +126,6 @@ function DashboardPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      {/* Header */}
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
           Welcome, {student.profile.name.split(" ")[0]}
@@ -158,7 +139,6 @@ function DashboardPage() {
         </div>
       </div>
 
-      {/* Profile Card */}
       <Card>
         <CardHeader className="flex flex-row items-start gap-4 space-y-0">
           <div className="size-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
@@ -180,7 +160,7 @@ function DashboardPage() {
             />
             <ProfileField
               label="Semesters Completed"
-              value={String(completed)}
+              value={String(semesters.length)}
             />
             <ProfileField
               label="Current CGPA"
@@ -213,7 +193,6 @@ function DashboardPage() {
         </Card>
       ) : (
         <>
-          {/* Stat cards */}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {stats.map((s) => (
               <Card key={s.label}>
@@ -236,15 +215,12 @@ function DashboardPage() {
                       {s.value}
                     </div>
                   )}
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {s.hint}
-                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">{s.hint}</p>
                 </CardContent>
               </Card>
             ))}
           </div>
 
-          {/* CGPA / SGPA Trend Chart */}
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
@@ -292,7 +268,6 @@ function DashboardPage() {
             </CardContent>
           </Card>
 
-          {/* Semester Overview */}
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
@@ -300,7 +275,7 @@ function DashboardPage() {
                 <CardTitle>Semester Overview</CardTitle>
               </div>
               <CardDescription>
-                All completed semesters with SGPA and credits earned.
+                All semesters with SGPA and credits earned.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -313,7 +288,7 @@ function DashboardPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {sortedSemesters.map((sem) => (
+                  {semesters.map((sem) => (
                     <TableRow key={sem.number}>
                       <TableCell className="font-medium">
                         Semester {sem.number}
