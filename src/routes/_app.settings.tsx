@@ -56,6 +56,7 @@ import {
   type StudentSettings,
   type ThemeMode,
 } from "@/lib/settings-store";
+import { downloadProfileBackup, importProfile } from "@/lib/profile-backup";
 
 export const Route = createFileRoute("/_app/settings")({
   component: SettingsPage,
