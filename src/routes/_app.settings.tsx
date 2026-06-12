@@ -13,6 +13,8 @@ import {
   LogOut,
   Sun,
   Moon,
+  Users,
+  Pencil,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
