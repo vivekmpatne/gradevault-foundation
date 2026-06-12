@@ -15,6 +15,7 @@ import {
   Compass,
   MessageSquare,
   Code2,
+  Upload,
 } from "lucide-react";
 import {
   Sidebar,
@@ -35,6 +36,7 @@ import { clearSession, getSession } from "@/lib/auth";
 const items = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Calculator", url: "/calculator", icon: Calculator },
+  { title: "Upload Marks", url: "/upload-marks", icon: Upload },
   { title: "History", url: "/history", icon: History },
   { title: "Suggestions", url: "/suggestions", icon: Lightbulb },
   { title: "Placement", url: "/placement", icon: Briefcase },

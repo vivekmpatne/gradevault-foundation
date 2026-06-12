@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppUploadMarksRouteImport } from './routes/_app.upload-marks'
 import { Route as AppSuggestionsRouteImport } from './routes/_app.suggestions'
 import { Route as AppStrategyRouteImport } from './routes/_app.strategy'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
@@ -32,6 +33,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppUploadMarksRoute = AppUploadMarksRouteImport.update({
+  id: '/upload-marks',
+  path: '/upload-marks',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppSuggestionsRoute = AppSuggestionsRouteImport.update({
   id: '/suggestions',
@@ -108,6 +114,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AppSettingsRoute
   '/strategy': typeof AppStrategyRoute
   '/suggestions': typeof AppSuggestionsRoute
+  '/upload-marks': typeof AppUploadMarksRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AppSettingsRoute
   '/strategy': typeof AppStrategyRoute
   '/suggestions': typeof AppSuggestionsRoute
+  '/upload-marks': typeof AppUploadMarksRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -140,6 +148,7 @@ export interface FileRoutesById {
   '/_app/settings': typeof AppSettingsRoute
   '/_app/strategy': typeof AppStrategyRoute
   '/_app/suggestions': typeof AppSuggestionsRoute
+  '/_app/upload-marks': typeof AppUploadMarksRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -157,6 +166,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/strategy'
     | '/suggestions'
+    | '/upload-marks'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -172,6 +182,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/strategy'
     | '/suggestions'
+    | '/upload-marks'
   id:
     | '__root__'
     | '/'
@@ -188,6 +199,7 @@ export interface FileRouteTypes {
     | '/_app/settings'
     | '/_app/strategy'
     | '/_app/suggestions'
+    | '/_app/upload-marks'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -210,6 +222,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_app/upload-marks': {
+      id: '/_app/upload-marks'
+      path: '/upload-marks'
+      fullPath: '/upload-marks'
+      preLoaderRoute: typeof AppUploadMarksRouteImport
+      parentRoute: typeof AppRoute
     }
     '/_app/suggestions': {
       id: '/_app/suggestions'
@@ -311,6 +330,7 @@ interface AppRouteChildren {
   AppSettingsRoute: typeof AppSettingsRoute
   AppStrategyRoute: typeof AppStrategyRoute
   AppSuggestionsRoute: typeof AppSuggestionsRoute
+  AppUploadMarksRoute: typeof AppUploadMarksRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -326,6 +346,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppSettingsRoute: AppSettingsRoute,
   AppStrategyRoute: AppStrategyRoute,
   AppSuggestionsRoute: AppSuggestionsRoute,
+  AppUploadMarksRoute: AppUploadMarksRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
