@@ -12,6 +12,7 @@ import {
   Users,
   ClipboardList,
   Gauge,
+  Compass,
 } from "lucide-react";
 import {
   Sidebar,
@@ -37,6 +38,7 @@ const items = [
   { title: "Placement", url: "/placement", icon: Briefcase },
   { title: "Placement Tracker", url: "/placement-tracker", icon: ClipboardList },
   { title: "Readiness Score", url: "/readiness", icon: Gauge },
+  { title: "Strategy Advisor", url: "/strategy", icon: Compass },
   { title: "Roadmap", url: "/roadmap", icon: Map },
   { title: "Settings", url: "/settings", icon: Settings },
 ] as const;

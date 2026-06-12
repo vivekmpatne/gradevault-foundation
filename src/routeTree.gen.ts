@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppSuggestionsRouteImport } from './routes/_app.suggestions'
+import { Route as AppStrategyRouteImport } from './routes/_app.strategy'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppRoadmapRouteImport } from './routes/_app.roadmap'
 import { Route as AppReadinessRouteImport } from './routes/_app.readiness'
@@ -33,6 +34,11 @@ const IndexRoute = IndexRouteImport.update({
 const AppSuggestionsRoute = AppSuggestionsRouteImport.update({
   id: '/suggestions',
   path: '/suggestions',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppStrategyRoute = AppStrategyRouteImport.update({
+  id: '/strategy',
+  path: '/strategy',
   getParentRoute: () => AppRoute,
 } as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/readiness': typeof AppReadinessRoute
   '/roadmap': typeof AppRoadmapRoute
   '/settings': typeof AppSettingsRoute
+  '/strategy': typeof AppStrategyRoute
   '/suggestions': typeof AppSuggestionsRoute
 }
 export interface FileRoutesByTo {
@@ -98,6 +105,7 @@ export interface FileRoutesByTo {
   '/readiness': typeof AppReadinessRoute
   '/roadmap': typeof AppRoadmapRoute
   '/settings': typeof AppSettingsRoute
+  '/strategy': typeof AppStrategyRoute
   '/suggestions': typeof AppSuggestionsRoute
 }
 export interface FileRoutesById {
@@ -112,6 +120,7 @@ export interface FileRoutesById {
   '/_app/readiness': typeof AppReadinessRoute
   '/_app/roadmap': typeof AppRoadmapRoute
   '/_app/settings': typeof AppSettingsRoute
+  '/_app/strategy': typeof AppStrategyRoute
   '/_app/suggestions': typeof AppSuggestionsRoute
 }
 export interface FileRouteTypes {
@@ -126,6 +135,7 @@ export interface FileRouteTypes {
     | '/readiness'
     | '/roadmap'
     | '/settings'
+    | '/strategy'
     | '/suggestions'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -138,6 +148,7 @@ export interface FileRouteTypes {
     | '/readiness'
     | '/roadmap'
     | '/settings'
+    | '/strategy'
     | '/suggestions'
   id:
     | '__root__'
@@ -151,6 +162,7 @@ export interface FileRouteTypes {
     | '/_app/readiness'
     | '/_app/roadmap'
     | '/_app/settings'
+    | '/_app/strategy'
     | '/_app/suggestions'
   fileRoutesById: FileRoutesById
 }
@@ -180,6 +192,13 @@ declare module '@tanstack/react-router' {
       path: '/suggestions'
       fullPath: '/suggestions'
       preLoaderRoute: typeof AppSuggestionsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/strategy': {
+      id: '/_app/strategy'
+      path: '/strategy'
+      fullPath: '/strategy'
+      preLoaderRoute: typeof AppStrategyRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/settings': {
@@ -250,6 +269,7 @@ interface AppRouteChildren {
   AppReadinessRoute: typeof AppReadinessRoute
   AppRoadmapRoute: typeof AppRoadmapRoute
   AppSettingsRoute: typeof AppSettingsRoute
+  AppStrategyRoute: typeof AppStrategyRoute
   AppSuggestionsRoute: typeof AppSuggestionsRoute
 }
 
@@ -262,6 +282,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppReadinessRoute: AppReadinessRoute,
   AppRoadmapRoute: AppRoadmapRoute,
   AppSettingsRoute: AppSettingsRoute,
+  AppStrategyRoute: AppStrategyRoute,
   AppSuggestionsRoute: AppSuggestionsRoute,
 }
 
@@ -274,13 +295,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
