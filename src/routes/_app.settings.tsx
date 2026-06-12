@@ -68,7 +68,7 @@ function SettingsPage() {
   const navigate = useNavigate();
   const student = getCurrentStudent();
   const session = getSession();
-  const { academic } = useStudent();
+  useStudent(); // subscribe so this page re-renders when academic data updates
   const [form, setForm] = useState<StudentSettings>(DEFAULT_SETTINGS);
   const [theme, setThemeMode] = useState<ThemeMode>("light");
   const [confirmClear, setConfirmClear] = useState(false);
