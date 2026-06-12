@@ -11,6 +11,7 @@ import {
   LogOut,
   Users,
   ClipboardList,
+  Gauge,
 } from "lucide-react";
 import {
   Sidebar,
