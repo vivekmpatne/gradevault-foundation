@@ -48,7 +48,63 @@ export const Route = createFileRoute("/_app/coding-hub")({
 
 
 function CodingHubPage() {
-  const { settings } = useStudent();
+  const { settings, academic } = useStudent();
+  const usn = academic.student?.profile.usn ?? "";
+
+  const [syncing, setSyncing] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [meta, setMeta] = useState<Partial<Record<SyncPlatform, number>>>({});
+  const autoRanRef = useRef(false);
+
+  useEffect(() => {
+    if (usn) setMeta(loadSyncMeta(usn));
+  }, [usn]);
+
+  const handles = useMemo(
+    () => ({
+      leetcode: settings.leetcodeUsername,
+      codeforces: settings.codeforcesHandle,
+      github: settings.githubUsername,
+    }),
+    [settings.leetcodeUsername, settings.codeforcesHandle, settings.githubUsername],
+  );
+
+  async function runSync(opts?: { silent?: boolean }) {
+    if (!usn) return;
+    if (!handles.leetcode && !handles.codeforces && !handles.github) {
+      if (!opts?.silent)
+        toast.error("Add a LeetCode, Codeforces or GitHub username first.");
+      return;
+    }
+    setSyncing(true);
+    try {
+      const results: SyncOutcome[] = await syncAll(usn, settings);
+      setMeta(loadSyncMeta(usn));
+      if (!opts?.silent) {
+        for (const r of results) {
+          if (r.ok) toast.success(`${labelFor(r.platform)} synced`);
+          else toast.error(`${labelFor(r.platform)}: ${r.error}`);
+        }
+      }
+    } finally {
+      setSyncing(false);
+    }
+  }
+
+  // Auto-sync once on mount when any linked platform's cache is stale.
+  useEffect(() => {
+    if (autoRanRef.current || !usn) return;
+    const anyLinked = handles.leetcode || handles.codeforces || handles.github;
+    if (!anyLinked) return;
+    const stale =
+      (handles.leetcode && isSyncStale(meta.leetcode)) ||
+      (handles.codeforces && isSyncStale(meta.codeforces)) ||
+      (handles.github && isSyncStale(meta.github));
+    if (!stale) return;
+    autoRanRef.current = true;
+    void runSync({ silent: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usn, handles.leetcode, handles.codeforces, handles.github, meta]);
 
   const update = <K extends keyof typeof settings>(
     key: K,
@@ -56,6 +112,7 @@ function CodingHubPage() {
   ) => {
     updateSettings({ [key]: value } as Partial<typeof settings>);
   };
+
 
   const linkedAccounts = useMemo(() => {
     const list: { label: string; value: string; url?: string }[] = [];
