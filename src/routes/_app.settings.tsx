@@ -399,6 +399,16 @@ function SettingsPage() {
             <Eraser className="size-4" />
             Clear Draft Data
           </Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              clearSession();
+              navigate({ to: "/" });
+            }}
+          >
+            <Users className="size-4" />
+            Switch Account
+          </Button>
           <Button variant="destructive" onClick={handleLogout}>
             <LogOut className="size-4" />
             Logout
