@@ -330,15 +330,44 @@ function CodingHubPage() {
 
 
 
-      {/* 2. Coding Progress */}
+      {/* 2. Coding Progress — auto-synced */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Hash className="size-5" /> Coding Progress
-          </CardTitle>
-          <CardDescription>
-            Update manually for now — auto-sync coming soon.
-          </CardDescription>
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 sm:flex sm:flex-wrap sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <CardTitle className="flex items-center gap-2">
+                <Hash className="size-5 shrink-0" />
+                <span className="truncate">Coding Progress</span>
+                {!editMode && (
+                  <Badge variant="outline" className="hidden sm:inline-flex">
+                    <Lock className="size-3 mr-1" /> Auto-synced
+                  </Badge>
+                )}
+              </CardTitle>
+              <CardDescription className="mt-1">
+                {editMode
+                  ? "Manual edit on — values will be overwritten on next sync."
+                  : "Pulled live from your linked profiles."}{" "}
+                <SyncedAt meta={meta} />
+              </CardDescription>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2 shrink-0">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setEditMode((v) => !v)}
+              >
+                <Pencil className="size-3.5" />
+                {editMode ? "Done" : "Edit"}
+              </Button>
+              <Button size="sm" onClick={() => runSync()} disabled={syncing}>
+                <RefreshCw
+                  className={cn("size-3.5", syncing && "animate-spin")}
+                />
+                {syncing ? "Syncing…" : "Sync now"}
+              </Button>
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
           <NumField
@@ -346,24 +375,34 @@ function CodingHubPage() {
             value={settings.totalProblemsSolved}
             onCommit={(v) => update("totalProblemsSolved", v)}
             max={10_000}
+            readOnly={!editMode}
+            syncedFrom={handles.leetcode ? "LeetCode" : undefined}
           />
           <NumField
             label="LeetCode Rating"
             value={settings.leetcode}
             onCommit={(v) => update("leetcode", v)}
             max={4000}
+            readOnly={!editMode}
+            syncedFrom={handles.leetcode ? "LeetCode" : undefined}
           />
           <NumField
             label="Codeforces Rating"
             value={settings.codeforces}
             onCommit={(v) => update("codeforces", v)}
             max={4500}
+            readOnly={!editMode}
+            syncedFrom={handles.codeforces ? "Codeforces" : undefined}
           />
           <NumField
             label="Contest Count"
             value={settings.contestCount}
             onCommit={(v) => update("contestCount", v)}
             max={2000}
+            readOnly={!editMode}
+            syncedFrom={
+              handles.leetcode || handles.codeforces ? "LC + CF" : undefined
+            }
           />
           <NumField
             label="Current Streak (days)"
@@ -373,6 +412,7 @@ function CodingHubPage() {
           />
         </CardContent>
       </Card>
+
 
       {/* 3. Development Progress */}
       <Card>
