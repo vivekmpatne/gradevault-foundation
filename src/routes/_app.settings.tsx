@@ -53,7 +53,7 @@ export const Route = createFileRoute("/_app/settings")({
 });
 
 const CALC_PREFIX = "gradevault_calc_";
-const SETTINGS_PREFIX = "gradevault_settings_";
+
 
 function SettingsPage() {
   const navigate = useNavigate();
