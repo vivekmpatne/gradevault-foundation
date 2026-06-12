@@ -129,8 +129,7 @@ function LoginPage() {
   };
 
   const handleFinishOnboarding = () => {
-    const current = loadSettings();
-    saveSettings({ ...DEFAULT_SETTINGS, ...current, prepTrack });
+    updateSettings({ prepTrack });
     setOnboardOpen(false);
     navigate({ to: "/dashboard" });
   };
