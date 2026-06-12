@@ -73,6 +73,14 @@ export function addApplication(
 ): Application | null {
   const s = getSession();
   if (!s) return null;
+  const all = readAll(s.usn);
+  // Dedupe: same company + role + applicationDate is treated as a duplicate.
+  const dupKey = (a: { company: string; role: string; applicationDate: string }) =>
+    `${a.company.trim().toLowerCase()}|${a.role.trim().toLowerCase()}|${a.applicationDate}`;
+  const incomingKey = dupKey(input);
+  if (all.some((a) => dupKey(a) === incomingKey)) {
+    return null;
+  }
   const now = Date.now();
   const app: Application = {
     ...input,
@@ -81,7 +89,6 @@ export function addApplication(
     updatedAt: now,
     source: input.source ?? "manual",
   };
-  const all = readAll(s.usn);
   all.unshift(app);
   writeAll(s.usn, all);
   return app;

@@ -56,16 +56,29 @@ export function addFeedback(input: {
 }): FeedbackEntry | null {
   const s = getSession();
   const now = Date.now();
+  const comment = input.comment.trim();
+  if (!comment) return null;
+  const all = readAll();
+  // Dedupe: same author + category + identical comment within 5 minutes
+  // suppresses double-submits from accidental double-clicks.
+  const recentWindow = 5 * 60 * 1000;
+  const isDuplicate = all.some(
+    (e) =>
+      e.authorUsn === (s?.usn ?? "—") &&
+      e.category === input.category &&
+      e.comment.trim().toLowerCase() === comment.toLowerCase() &&
+      now - e.createdAt < recentWindow,
+  );
+  if (isDuplicate) return null;
   const entry: FeedbackEntry = {
     id: `fb_${now}_${Math.random().toString(36).slice(2, 8)}`,
     category: input.category,
     rating: Math.min(10, Math.max(1, Math.round(input.rating))),
-    comment: input.comment.trim(),
+    comment,
     authorName: s?.name ?? "Anonymous",
     authorUsn: s?.usn ?? "—",
     createdAt: now,
   };
-  const all = readAll();
   all.unshift(entry);
   writeAll(all);
   return entry;
