@@ -526,6 +526,22 @@ function PlacementTrackerPage() {
           )}
         </CardContent>
       </Card>
+      )}
+
+      {/* Board (Kanban) view */}
+      {view === "board" && (
+        <KanbanBoard
+          apps={filtered}
+          draggingId={draggingId}
+          setDraggingId={setDraggingId}
+          onDrop={(id, status) => {
+            updateApplication(id, { status });
+            toast.success(`Moved to ${status}`);
+          }}
+          onEdit={openEdit}
+          onDelete={(id) => setDeleteId(id)}
+        />
+      )}
 
       {/* Add/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
