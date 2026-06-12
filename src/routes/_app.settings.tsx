@@ -183,24 +183,8 @@ function SettingsPage() {
       </div>
 
       {/* Profile */}
-      <Card>
-        <CardHeader>
-          <SectionTitle icon={User}>Profile</SectionTitle>
-          <CardDescription>Read-only details from your account.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-            <Field label="Student Name" value={student.profile.name} />
-            <Field label="USN" value={student.profile.usn} mono />
-            <Field label="Branch" value={student.profile.branch} />
-            <Field label="University" value="VTU" />
-            <Field
-              label="Current Semester"
-              value={`Sem ${academic.currentSemester}`}
-            />
-          </dl>
-        </CardContent>
-      </Card>
+      <ProfileCard />
+
 
       {/* Career Preferences */}
       <Card>
