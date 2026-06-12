@@ -91,6 +91,16 @@ export function AppSidebar() {
           size={collapsed ? "icon" : "default"}
           onClick={handleLogout}
           className="justify-start"
+          title="Switch Account"
+        >
+          <Users className="size-4" />
+          {!collapsed && <span>Switch Account</span>}
+        </Button>
+        <Button
+          variant="ghost"
+          size={collapsed ? "icon" : "default"}
+          onClick={handleLogout}
+          className="justify-start"
         >
           <LogOut className="size-4" />
           {!collapsed && <span>Logout</span>}
