@@ -413,8 +413,8 @@ function SettingsPage() {
 }
 
 function ProfileCard() {
-  const student = getCurrentStudent();
   const { academic } = useStudent();
+  const student = academic.student;
   const editable = student ? isLocalStudent(student.profile.usn) : false;
   const [editing, setEditing] = useState(false);
   const [pf, setPf] = useState({
@@ -439,14 +439,13 @@ function ProfileCard() {
         ? String(student.profile.graduationYear)
         : "",
     });
-    // student object identity changes every render; key effect on usn + editing
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [usn, editing]);
 
   if (!student) return null;
 
   function saveProfile() {
-    const res = updateLocalStudent(student!.profile.usn, {
+    const res = updateProfile({
       name: pf.name,
       branch: pf.branch,
       currentSemester: Number(pf.currentSemester),
@@ -458,17 +457,6 @@ function ProfileCard() {
       toast.error(res.error ?? "Could not save profile");
       return;
     }
-    // Keep session in sync (name may have changed).
-    if (res.student) {
-      localStorage.setItem(
-        "gradevault_session",
-        JSON.stringify({
-          name: res.student.profile.name,
-          usn: res.student.profile.usn,
-        }),
-      );
-    }
-    window.dispatchEvent(new Event("gradevault:academic-changed"));
     toast.success("Profile updated");
     setEditing(false);
   }
