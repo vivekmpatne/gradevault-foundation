@@ -71,12 +71,16 @@ function DashboardPage() {
   const navigate = useNavigate();
   const data = useAcademicData();
   const { settings } = useSettings();
+  const [bootstrapped, setBootstrapped] = useState(false);
 
   useEffect(() => {
     if (!data.student) navigate({ to: "/" });
+    const t = setTimeout(() => setBootstrapped(true), 250);
+    return () => clearTimeout(t);
   }, [data.student, navigate]);
 
   if (!data.student) return null;
+  if (!bootstrapped) return <DashboardSkeleton />;
 
   const {
     student,
