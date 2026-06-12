@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import {
   deleteSemester as deleteSavedSemester,
   emitAcademicChange,
+  useAcademicData,
 } from "@/lib/academic-store";
 import {
   Card,
@@ -56,6 +57,7 @@ const NEW_SEM = "new";
 
 function CalculatorPage() {
   const navigate = useNavigate();
+  const academic = useAcademicData();
   const [student, setStudent] = useState<Student | null>(null);
   const [saved, setSaved] = useState<Record<number, CalcSemester>>({});
   const [selected, setSelected] = useState<string>("1");
@@ -70,9 +72,8 @@ function CalculatorPage() {
     setStudent(s);
     const all = loadAllSemesters();
     setSaved(all);
-    // pre-seed from bundled student data if no saved draft exists
-    const firstSem = s.semesters[0]?.number ?? 1;
-    const initial = String(firstSem);
+    // Default to the centrally-derived current semester so all tabs agree.
+    const initial = String(academic.currentSemester || 1);
     setSelected(initial);
     loadInto(initial, all, s);
   }, [navigate]);
