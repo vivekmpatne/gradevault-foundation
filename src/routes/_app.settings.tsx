@@ -74,14 +74,15 @@ function SettingsPage() {
   const [confirmClear, setConfirmClear] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const usn = student?.profile.usn;
   useEffect(() => {
-    if (!student) {
+    if (!usn) {
       navigate({ to: "/" });
       return;
     }
     setForm(loadSettings());
     setThemeMode(loadTheme());
-  }, [student, navigate]);
+  }, [usn, navigate]);
 
   if (!student || !session) return null;
 
