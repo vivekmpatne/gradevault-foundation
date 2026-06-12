@@ -118,22 +118,20 @@ function HistoryPage() {
 
       {!hasData ? (
         <Card>
-          <CardContent className="py-12 flex flex-col items-center text-center gap-4">
-            <div className="size-14 rounded-2xl bg-muted flex items-center justify-center">
-              <BookOpen className="size-7 text-muted-foreground" />
-            </div>
-            <div className="space-y-1">
-              <p className="font-medium">No academic history found.</p>
-              <p className="text-sm text-muted-foreground">
-                Add your semester data from the Calculator tab.
-              </p>
-            </div>
-            <Button asChild>
-              <Link to="/calculator">
-                <CalculatorIcon className="size-4" />
-                Go to Calculator
-              </Link>
-            </Button>
+          <CardContent className="py-6">
+            <EmptyState
+              icon={BookOpen}
+              title="No academic history yet"
+              description="Add your first semester from the Calculator tab and it'll show up here with full breakdowns and SGPA trends."
+              action={
+                <Button asChild>
+                  <Link to="/calculator">
+                    <CalculatorIcon className="size-4" />
+                    Go to Calculator
+                  </Link>
+                </Button>
+              }
+            />
           </CardContent>
         </Card>
       ) : (
