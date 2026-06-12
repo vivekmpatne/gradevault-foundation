@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { getSession } from "@/lib/auth";
+import { applyTheme, loadTheme } from "@/lib/settings-store";
 
 export const Route = createFileRoute("/_app")({
   component: AppLayout,
@@ -16,6 +17,7 @@ function AppLayout() {
     if (!getSession()) {
       navigate({ to: "/" });
     } else {
+      applyTheme(loadTheme());
       setReady(true);
     }
   }, [navigate]);

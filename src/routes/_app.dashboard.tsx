@@ -47,6 +47,7 @@ import {
   YAxis,
 } from "recharts";
 import { useAcademicData } from "@/lib/academic-store";
+import { useSettings } from "@/lib/settings-store";
 
 export const Route = createFileRoute("/_app/dashboard")({
   component: DashboardPage,
@@ -67,6 +68,7 @@ function sgpaColor(v: number): string {
 function DashboardPage() {
   const navigate = useNavigate();
   const data = useAcademicData();
+  const { settings } = useSettings();
 
   useEffect(() => {
     if (!data.student) navigate({ to: "/" });
@@ -229,6 +231,40 @@ function DashboardPage() {
           </dl>
         </CardContent>
       </Card>
+
+      {/* Goals (from Settings) */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Your Goals</CardTitle>
+          <CardDescription>
+            Update these in Settings to keep your dashboard aligned.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <dl className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+            <ProfileField
+              label="Target CGPA"
+              value={settings.targetCGPA.toFixed(2)}
+            />
+            <ProfileField
+              label="Prep Track"
+              value={prepTrackLabel(settings.prepTrack)}
+            />
+            <ProfileField
+              label="Career Goal"
+              value={settings.careerGoal || "—"}
+            />
+          </dl>
+          {hasData && (
+            <div className="mt-3 text-xs text-muted-foreground">
+              {cgpa >= settings.targetCGPA
+                ? `On track — current CGPA ${cgpa.toFixed(2)} meets your target.`
+                : `Gap of ${(settings.targetCGPA - cgpa).toFixed(2)} CGPA to reach your target.`}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
 
       {!hasData ? (
         <Card>
@@ -474,4 +510,11 @@ function LegendDot({
       {label}
     </span>
   );
+}
+
+function prepTrackLabel(t: string): string {
+  if (t === "on-campus") return "On-Campus Placement";
+  if (t === "off-campus") return "Off-Campus Placement";
+  if (t === "higher-studies") return "Higher Studies";
+  return "—";
 }
