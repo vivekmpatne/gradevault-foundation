@@ -12,6 +12,7 @@ import {
   Users,
   ClipboardList,
   Gauge,
+  Compass,
 } from "lucide-react";
 import {
   Sidebar,
