@@ -440,6 +440,182 @@ function SettingsPage() {
   );
 }
 
+function ProfileCard() {
+  const student = getCurrentStudent();
+  const { academic } = useStudent();
+  const editable = student ? isLocalStudent(student.profile.usn) : false;
+  const [editing, setEditing] = useState(false);
+  const [pf, setPf] = useState({
+    name: "",
+    branch: "",
+    currentSemester: 1,
+    college: "",
+    university: "VTU",
+    graduationYear: "",
+  });
+
+  useEffect(() => {
+    if (!student) return;
+    setPf({
+      name: student.profile.name,
+      branch: student.profile.branch,
+      currentSemester: student.profile.currentSemester || 1,
+      college: student.profile.college ?? "",
+      university: student.profile.university ?? "VTU",
+      graduationYear: student.profile.graduationYear
+        ? String(student.profile.graduationYear)
+        : "",
+    });
+  }, [student, editing]);
+
+  if (!student) return null;
+
+  function saveProfile() {
+    const res = updateLocalStudent(student!.profile.usn, {
+      name: pf.name,
+      branch: pf.branch,
+      currentSemester: Number(pf.currentSemester),
+      college: pf.college,
+      university: pf.university,
+      graduationYear: pf.graduationYear ? Number(pf.graduationYear) : undefined,
+    });
+    if (!res.ok) {
+      toast.error(res.error ?? "Could not save profile");
+      return;
+    }
+    // Keep session in sync (name may have changed).
+    if (res.student) {
+      localStorage.setItem(
+        "gradevault_session",
+        JSON.stringify({
+          name: res.student.profile.name,
+          usn: res.student.profile.usn,
+        }),
+      );
+    }
+    window.dispatchEvent(new Event("gradevault:academic-changed"));
+    toast.success("Profile updated");
+    setEditing(false);
+  }
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-start justify-between gap-3 space-y-0">
+        <div>
+          <SectionTitle icon={User}>Profile</SectionTitle>
+          <CardDescription>
+            {editable
+              ? "Edit your account details. USN cannot be changed."
+              : "Demo accounts are read-only."}
+          </CardDescription>
+        </div>
+        {editable && !editing && (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setEditing(true)}
+          >
+            <Pencil className="size-4" />
+            Edit
+          </Button>
+        )}
+      </CardHeader>
+      <CardContent>
+        {!editing ? (
+          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+            <Field label="Student Name" value={student.profile.name} />
+            <Field label="USN" value={student.profile.usn} mono />
+            <Field label="Branch" value={student.profile.branch} />
+            <Field
+              label="University"
+              value={student.profile.university ?? "VTU"}
+            />
+            <Field
+              label="College"
+              value={student.profile.college || "—"}
+            />
+            <Field
+              label="Graduation Year"
+              value={
+                student.profile.graduationYear
+                  ? String(student.profile.graduationYear)
+                  : "—"
+              }
+            />
+            <Field
+              label="Current Semester"
+              value={`Sem ${academic.currentSemester}`}
+            />
+          </dl>
+        ) : (
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="p-name">Name</Label>
+              <Input
+                id="p-name"
+                value={pf.name}
+                onChange={(e) => setPf({ ...pf, name: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>USN</Label>
+              <Input value={student.profile.usn} disabled className="font-mono" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="p-branch">Branch</Label>
+              <Input
+                id="p-branch"
+                value={pf.branch}
+                onChange={(e) => setPf({ ...pf, branch: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="p-sem">Current Semester</Label>
+              <Input
+                id="p-sem"
+                type="number"
+                min={1}
+                max={8}
+                value={pf.currentSemester}
+                onChange={(e) =>
+                  setPf({ ...pf, currentSemester: Number(e.target.value) || 1 })
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="p-college">College</Label>
+              <Input
+                id="p-college"
+                value={pf.college}
+                onChange={(e) => setPf({ ...pf, college: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="p-grad">Graduation Year</Label>
+              <Input
+                id="p-grad"
+                type="number"
+                min={2020}
+                max={2040}
+                value={pf.graduationYear}
+                onChange={(e) =>
+                  setPf({ ...pf, graduationYear: e.target.value })
+                }
+              />
+            </div>
+            <div className="sm:col-span-2 flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setEditing(false)}>
+                Cancel
+              </Button>
+              <Button onClick={saveProfile}>Save Profile</Button>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 function SectionTitle({
   icon: Icon,
   children,
