@@ -34,6 +34,7 @@ import {
 } from "@/lib/settings-store";
 import { cn } from "@/lib/utils";
 import { GithubIntegrationPanel } from "@/components/github-integration-panel";
+import { DsaAnalyticsPanel } from "@/components/dsa-analytics-panel";
 
 export const Route = createFileRoute("/_app/coding-hub")({
   component: CodingHubPage,
@@ -256,6 +257,13 @@ function CodingHubPage() {
 
       {/* GitHub Integration (live) */}
       <GithubIntegrationPanel username={settings.githubUsername} />
+
+      {/* DSA Analytics (LeetCode + Codeforces) */}
+      <DsaAnalyticsPanel
+        leetcodeUsername={settings.leetcodeUsername}
+        codeforcesHandle={settings.codeforcesHandle}
+      />
+
 
 
 
