@@ -466,7 +466,11 @@ function CalculatorPage() {
 
           <div className="flex flex-wrap gap-2 justify-end pt-2 border-t">
             {selected !== NEW_SEM && saved[Number(selected)] && (
-              <Button variant="ghost" onClick={handleDelete}>
+              <Button
+                variant="ghost"
+                onClick={() => setConfirmDelete(true)}
+                className="text-destructive hover:text-destructive"
+              >
                 <Trash2 className="size-4" />
                 Delete Semester
               </Button>
@@ -482,6 +486,32 @@ function CalculatorPage() {
           </div>
         </CardContent>
       </Card>
+
+      <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Delete Semester {selected}?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This permanently removes all subjects, marks and credits saved
+              for Semester {selected}. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                handleDelete();
+                setConfirmDelete(false);
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
