@@ -122,12 +122,12 @@ function SuggestionsPage() {
   const projScore = Math.min(25, (settings.projects / 5) * 25);
   const readiness = Math.round(cgpaScore + lcScore + cfScore + projScore);
   const readinessTone: Tone =
-    readiness >= 75 ? "good" : readiness >= 50 ? "warn" : "bad";
+    readiness >= 71 ? "good" : readiness >= 41 ? "warn" : "bad";
   const readinessLabel =
-    readiness >= 75
-      ? "Job Ready"
-      : readiness >= 50
-        ? "Getting There"
+    readiness >= 71
+      ? "Placement Ready"
+      : readiness >= 41
+        ? "Good Progress"
         : "Needs Work";
 
   return (
