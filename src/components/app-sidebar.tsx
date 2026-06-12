@@ -13,6 +13,7 @@ import {
   ClipboardList,
   Gauge,
   Compass,
+  MessageSquare,
 } from "lucide-react";
 import {
   Sidebar,
@@ -40,6 +41,7 @@ const items = [
   { title: "Readiness Score", url: "/readiness", icon: Gauge },
   { title: "Strategy Advisor", url: "/strategy", icon: Compass },
   { title: "Roadmap", url: "/roadmap", icon: Map },
+  { title: "Feedback", url: "/feedback", icon: MessageSquare },
   { title: "Settings", url: "/settings", icon: Settings },
 ] as const;
 
