@@ -49,8 +49,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { useAcademicData } from "@/lib/academic-store";
-import { useSettings } from "@/lib/settings-store";
+import { useStudent } from "@/lib/student-store";
+import { Progress } from "@/components/ui/progress";
 
 export const Route = createFileRoute("/_app/dashboard")({
   component: DashboardPage,
