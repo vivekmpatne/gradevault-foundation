@@ -9,8 +9,8 @@ import {
   Lightbulb,
   Download,
   Trash2,
-  Shield,
 } from "lucide-react";
+
 import { toast } from "sonner";
 import {
   Card,
@@ -25,7 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
+
 import {
   Select,
   SelectContent,
