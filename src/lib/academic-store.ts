@@ -137,10 +137,10 @@ export function computeAcademicData(): AcademicData {
     semesters.length > 0 ? semesters[semesters.length - 1].number : 0;
   
 
-  // Current Semester = highest semester number present in history.
-  // Falls back to 1 when there is no history yet.
-  const currentSemester =
-    latestSemesterNumber > 0 ? latestSemesterNumber : 1;
+  // Current Semester = max(latest semester with data, the student's
+  // declared current semester). Falls back to 1 when nothing exists.
+  const declaredCurrent = student.profile.currentSemester || 1;
+  const currentSemester = Math.max(latestSemesterNumber, declaredCurrent, 1);
 
   const totalCredits = completedList.reduce((a, s) => a + s.credits, 0);
   const weighted = completedList.reduce((a, s) => a + s.sgpa * s.credits, 0);
