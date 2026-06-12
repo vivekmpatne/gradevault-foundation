@@ -70,8 +70,7 @@ function sgpaColor(v: number): string {
 
 function DashboardPage() {
   const navigate = useNavigate();
-  const data = useAcademicData();
-  const { settings } = useSettings();
+  const { academic: data, settings, profileCompletion } = useStudent();
   const [bootstrapped, setBootstrapped] = useState(false);
 
   useEffect(() => {
