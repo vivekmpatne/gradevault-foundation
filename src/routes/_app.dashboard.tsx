@@ -95,10 +95,54 @@ function DashboardPage() {
     low: "bg-destructive/15 text-destructive border-destructive/30",
   };
 
-  const chartData = semesters.map((s) => ({
-    semester: `Sem ${s.number}`,
-    sgpa: Number(s.sgpa.toFixed(2)),
-  }));
+  const completed = semesters.filter((s) => s.completed);
+  const lastCompletedNum = completed.length
+    ? completed[completed.length - 1].number
+    : 0;
+  const projectedY = completed.length
+    ? Number(completed[completed.length - 1].sgpa.toFixed(2))
+    : null;
+
+  // Build a continuous 1..8 timeline so projection lines render past the last
+  // completed semester.
+  const chartData = Array.from({ length: 8 }, (_, i) => {
+    const num = i + 1;
+    const sem = semesters.find((s) => s.number === num);
+    const sgpa =
+      sem && sem.completed ? Number(sem.sgpa.toFixed(2)) : null;
+    let projected: number | null = null;
+    if (projectedY !== null && num >= lastCompletedNum && num <= 8) {
+      projected = projectedY;
+    }
+    return { semester: `Sem ${num}`, sgpa, projected };
+  });
+
+  // Trend: compare last two completed SGPAs.
+  let trend: "improving" | "stable" | "declining" = "stable";
+  if (completed.length >= 2) {
+    const diff =
+      completed[completed.length - 1].sgpa -
+      completed[completed.length - 2].sgpa;
+    if (diff > 0.1) trend = "improving";
+    else if (diff < -0.1) trend = "declining";
+  }
+  const trendMeta = {
+    improving: {
+      label: "Improving",
+      Icon: ArrowUpRight,
+      cls: "bg-emerald-500/15 text-emerald-600 border-emerald-500/30",
+    },
+    stable: {
+      label: "Stable",
+      Icon: ArrowRight,
+      cls: "bg-blue-500/15 text-blue-600 border-blue-500/30",
+    },
+    declining: {
+      label: "Declining",
+      Icon: ArrowDownRight,
+      cls: "bg-destructive/15 text-destructive border-destructive/30",
+    },
+  }[trend];
 
   const stats = [
     {
