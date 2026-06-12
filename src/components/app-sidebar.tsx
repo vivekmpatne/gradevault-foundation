@@ -10,6 +10,7 @@ import {
   Settings,
   LogOut,
   Users,
+  ClipboardList,
 } from "lucide-react";
 import {
   Sidebar,
