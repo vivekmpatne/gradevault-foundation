@@ -9,38 +9,141 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppSuggestionsRouteImport } from './routes/_app.suggestions'
+import { Route as AppSettingsRouteImport } from './routes/_app.settings'
+import { Route as AppRoadmapRouteImport } from './routes/_app.roadmap'
+import { Route as AppPlacementRouteImport } from './routes/_app.placement'
+import { Route as AppHistoryRouteImport } from './routes/_app.history'
+import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppCalculatorRouteImport } from './routes/_app.calculator'
 
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppSuggestionsRoute = AppSuggestionsRouteImport.update({
+  id: '/suggestions',
+  path: '/suggestions',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRoadmapRoute = AppRoadmapRouteImport.update({
+  id: '/roadmap',
+  path: '/roadmap',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPlacementRoute = AppPlacementRouteImport.update({
+  id: '/placement',
+  path: '/placement',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppHistoryRoute = AppHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCalculatorRoute = AppCalculatorRouteImport.update({
+  id: '/calculator',
+  path: '/calculator',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/calculator': typeof AppCalculatorRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/history': typeof AppHistoryRoute
+  '/placement': typeof AppPlacementRoute
+  '/roadmap': typeof AppRoadmapRoute
+  '/settings': typeof AppSettingsRoute
+  '/suggestions': typeof AppSuggestionsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/calculator': typeof AppCalculatorRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/history': typeof AppHistoryRoute
+  '/placement': typeof AppPlacementRoute
+  '/roadmap': typeof AppRoadmapRoute
+  '/settings': typeof AppSettingsRoute
+  '/suggestions': typeof AppSuggestionsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/_app/calculator': typeof AppCalculatorRoute
+  '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/history': typeof AppHistoryRoute
+  '/_app/placement': typeof AppPlacementRoute
+  '/_app/roadmap': typeof AppRoadmapRoute
+  '/_app/settings': typeof AppSettingsRoute
+  '/_app/suggestions': typeof AppSuggestionsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/calculator'
+    | '/dashboard'
+    | '/history'
+    | '/placement'
+    | '/roadmap'
+    | '/settings'
+    | '/suggestions'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/calculator'
+    | '/dashboard'
+    | '/history'
+    | '/placement'
+    | '/roadmap'
+    | '/settings'
+    | '/suggestions'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/_app/calculator'
+    | '/_app/dashboard'
+    | '/_app/history'
+    | '/_app/placement'
+    | '/_app/roadmap'
+    | '/_app/settings'
+    | '/_app/suggestions'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +151,83 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/suggestions': {
+      id: '/_app/suggestions'
+      path: '/suggestions'
+      fullPath: '/suggestions'
+      preLoaderRoute: typeof AppSuggestionsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/roadmap': {
+      id: '/_app/roadmap'
+      path: '/roadmap'
+      fullPath: '/roadmap'
+      preLoaderRoute: typeof AppRoadmapRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/placement': {
+      id: '/_app/placement'
+      path: '/placement'
+      fullPath: '/placement'
+      preLoaderRoute: typeof AppPlacementRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/history': {
+      id: '/_app/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof AppHistoryRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/calculator': {
+      id: '/_app/calculator'
+      path: '/calculator'
+      fullPath: '/calculator'
+      preLoaderRoute: typeof AppCalculatorRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppCalculatorRoute: typeof AppCalculatorRoute
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppHistoryRoute: typeof AppHistoryRoute
+  AppPlacementRoute: typeof AppPlacementRoute
+  AppRoadmapRoute: typeof AppRoadmapRoute
+  AppSettingsRoute: typeof AppSettingsRoute
+  AppSuggestionsRoute: typeof AppSuggestionsRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppCalculatorRoute: AppCalculatorRoute,
+  AppDashboardRoute: AppDashboardRoute,
+  AppHistoryRoute: AppHistoryRoute,
+  AppPlacementRoute: AppPlacementRoute,
+  AppRoadmapRoute: AppRoadmapRoute,
+  AppSettingsRoute: AppSettingsRoute,
+  AppSuggestionsRoute: AppSuggestionsRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
