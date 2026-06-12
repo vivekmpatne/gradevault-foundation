@@ -36,6 +36,7 @@ const items = [
   { title: "Suggestions", url: "/suggestions", icon: Lightbulb },
   { title: "Placement", url: "/placement", icon: Briefcase },
   { title: "Placement Tracker", url: "/placement-tracker", icon: ClipboardList },
+  { title: "Readiness Score", url: "/readiness", icon: Gauge },
   { title: "Roadmap", url: "/roadmap", icon: Map },
   { title: "Settings", url: "/settings", icon: Settings },
 ] as const;
