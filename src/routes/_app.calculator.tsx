@@ -72,6 +72,7 @@ function CalculatorPage() {
   const [saved, setSaved] = useState<Record<number, CalcSemester>>({});
   const [selected, setSelected] = useState<string>("1");
   const [subjects, setSubjects] = useState<CalcSubject[]>([newSubject()]);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
     const s = getCurrentStudent();
