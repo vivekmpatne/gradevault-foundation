@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { DEMO_ACCOUNT, findStudent, getSession, saveSession } from "@/lib/auth";
+import { findStudent, getDemoStudent, getSession, saveSession } from "@/lib/auth";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -40,7 +40,7 @@ function LoginPage() {
   };
 
   const handleDemo = () => {
-    saveSession(DEMO_ACCOUNT);
+    saveSession(getDemoStudent());
     navigate({ to: "/dashboard" });
   };
 
