@@ -434,6 +434,8 @@ function CodingHubPage() {
             value={settings.githubRepos}
             onCommit={(v) => update("githubRepos", v)}
             max={2000}
+            readOnly={!editMode && !!handles.github}
+            syncedFrom={handles.github ? "GitHub" : undefined}
           />
           <NumField
             label="Open-Source Contributions"
@@ -446,7 +448,10 @@ function CodingHubPage() {
             value={settings.activeDevDays}
             onCommit={(v) => update("activeDevDays", v)}
             max={3650}
+            readOnly={!editMode && !!handles.github}
+            syncedFrom={handles.github ? "GitHub" : undefined}
           />
+
         </CardContent>
       </Card>
 
