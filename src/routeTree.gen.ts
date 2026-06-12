@@ -14,6 +14,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppSuggestionsRouteImport } from './routes/_app.suggestions'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppRoadmapRouteImport } from './routes/_app.roadmap'
+import { Route as AppPlacementTrackerRouteImport } from './routes/_app.placement-tracker'
 import { Route as AppPlacementRouteImport } from './routes/_app.placement'
 import { Route as AppHistoryRouteImport } from './routes/_app.history'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
@@ -43,6 +44,11 @@ const AppRoadmapRoute = AppRoadmapRouteImport.update({
   path: '/roadmap',
   getParentRoute: () => AppRoute,
 } as any)
+const AppPlacementTrackerRoute = AppPlacementTrackerRouteImport.update({
+  id: '/placement-tracker',
+  path: '/placement-tracker',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppPlacementRoute = AppPlacementRouteImport.update({
   id: '/placement',
   path: '/placement',
@@ -70,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AppDashboardRoute
   '/history': typeof AppHistoryRoute
   '/placement': typeof AppPlacementRoute
+  '/placement-tracker': typeof AppPlacementTrackerRoute
   '/roadmap': typeof AppRoadmapRoute
   '/settings': typeof AppSettingsRoute
   '/suggestions': typeof AppSuggestionsRoute
@@ -80,6 +87,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AppDashboardRoute
   '/history': typeof AppHistoryRoute
   '/placement': typeof AppPlacementRoute
+  '/placement-tracker': typeof AppPlacementTrackerRoute
   '/roadmap': typeof AppRoadmapRoute
   '/settings': typeof AppSettingsRoute
   '/suggestions': typeof AppSuggestionsRoute
@@ -92,6 +100,7 @@ export interface FileRoutesById {
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/history': typeof AppHistoryRoute
   '/_app/placement': typeof AppPlacementRoute
+  '/_app/placement-tracker': typeof AppPlacementTrackerRoute
   '/_app/roadmap': typeof AppRoadmapRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/suggestions': typeof AppSuggestionsRoute
@@ -104,6 +113,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/history'
     | '/placement'
+    | '/placement-tracker'
     | '/roadmap'
     | '/settings'
     | '/suggestions'
@@ -114,6 +124,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/history'
     | '/placement'
+    | '/placement-tracker'
     | '/roadmap'
     | '/settings'
     | '/suggestions'
@@ -125,6 +136,7 @@ export interface FileRouteTypes {
     | '/_app/dashboard'
     | '/_app/history'
     | '/_app/placement'
+    | '/_app/placement-tracker'
     | '/_app/roadmap'
     | '/_app/settings'
     | '/_app/suggestions'
@@ -172,6 +184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRoadmapRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/placement-tracker': {
+      id: '/_app/placement-tracker'
+      path: '/placement-tracker'
+      fullPath: '/placement-tracker'
+      preLoaderRoute: typeof AppPlacementTrackerRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/placement': {
       id: '/_app/placement'
       path: '/placement'
@@ -208,6 +227,7 @@ interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
   AppHistoryRoute: typeof AppHistoryRoute
   AppPlacementRoute: typeof AppPlacementRoute
+  AppPlacementTrackerRoute: typeof AppPlacementTrackerRoute
   AppRoadmapRoute: typeof AppRoadmapRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppSuggestionsRoute: typeof AppSuggestionsRoute
@@ -218,6 +238,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppHistoryRoute: AppHistoryRoute,
   AppPlacementRoute: AppPlacementRoute,
+  AppPlacementTrackerRoute: AppPlacementTrackerRoute,
   AppRoadmapRoute: AppRoadmapRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppSuggestionsRoute: AppSuggestionsRoute,
