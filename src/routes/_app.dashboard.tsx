@@ -511,3 +511,10 @@ function LegendDot({
     </span>
   );
 }
+
+function prepTrackLabel(t: string): string {
+  if (t === "on-campus") return "On-Campus Placement";
+  if (t === "off-campus") return "Off-Campus Placement";
+  if (t === "higher-studies") return "Higher Studies";
+  return "—";
+}
