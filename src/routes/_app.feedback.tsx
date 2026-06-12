@@ -9,8 +9,8 @@ import {
   Lightbulb,
   Download,
   Trash2,
-  Shield,
 } from "lucide-react";
+
 import { toast } from "sonner";
 import {
   Card,
@@ -25,7 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
+
 import {
   Select,
   SelectContent,
@@ -64,7 +64,7 @@ function FeedbackPage() {
   const session = getSession();
   const currentUsn = session?.usn ?? "";
 
-  const [devMode, setDevMode] = useState(false);
+  
 
   const [category, setCategory] = useState<FeedbackCategory>("General Feedback");
   const [rating, setRating] = useState(8);
@@ -76,21 +76,22 @@ function FeedbackPage() {
     "newest",
   );
 
-  // Visible list — in dev mode everyone, otherwise just the current user's
+  // Visible list — always scoped to the current user. No cross-user view.
   const visible = useMemo(
-    () => (devMode ? all : all.filter((f) => f.authorUsn === currentUsn)),
-    [all, devMode, currentUsn],
+    () => all.filter((f) => f.authorUsn === currentUsn),
+    [all, currentUsn],
   );
 
-  // Stats are based on the ENTIRE collection (the question asks for app-wide
-  // counts/averages), independent of dev mode.
+
+  // Stats reflect only the current user's own submissions.
   const stats = useMemo(() => {
-    const total = all.length;
-    const avg = total ? all.reduce((s, f) => s + f.rating, 0) / total : 0;
-    const bugs = all.filter((f) => f.category === "Bug Report").length;
-    const feats = all.filter((f) => f.category === "Feature Request").length;
+    const total = visible.length;
+    const avg = total ? visible.reduce((s, f) => s + f.rating, 0) / total : 0;
+    const bugs = visible.filter((f) => f.category === "Bug Report").length;
+    const feats = visible.filter((f) => f.category === "Feature Request").length;
     return { total, avg, bugs, feats };
-  }, [all]);
+  }, [visible]);
+
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -118,7 +119,7 @@ function FeedbackPage() {
   };
 
   const handleExport = () => {
-    const payload = devMode ? all : visible;
+    const payload = visible;
     const blob = new Blob([JSON.stringify(payload, null, 2)], {
       type: "application/json",
     });
@@ -143,14 +144,8 @@ function FeedbackPage() {
             just share a thought.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <label className="flex items-center gap-2 text-sm cursor-pointer">
-            <Shield className="size-4 text-muted-foreground" />
-            <span>Developer Mode</span>
-            <Switch checked={devMode} onCheckedChange={setDevMode} />
-          </label>
-        </div>
       </div>
+
 
       {/* Dashboard cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -229,7 +224,7 @@ function FeedbackPage() {
       <Card>
         <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <CardTitle>{devMode ? "All Feedback" : "Your Feedback"}</CardTitle>
+            <CardTitle>Your Feedback</CardTitle>
             <CardDescription>
               {filtered.length} of {visible.length} shown
             </CardDescription>
@@ -280,7 +275,7 @@ function FeedbackPage() {
           {visible.length === 0 ? (
             <EmptyState
               icon={MessageSquare}
-              title={devMode ? "No feedback yet" : "You haven't submitted feedback yet"}
+              title="You haven't submitted feedback yet"
               description="Use the form above to send your first piece of feedback."
             />
           ) : filtered.length === 0 ? (
@@ -293,9 +288,9 @@ function FeedbackPage() {
                 <FeedbackCard
                   key={f.id}
                   entry={f}
-                  showAuthor={devMode}
+                  showAuthor={false}
                   onDelete={
-                    f.authorUsn === currentUsn || devMode
+                    f.authorUsn === currentUsn
                       ? () => {
                           deleteFeedback(f.id);
                           toast.success("Feedback deleted");
@@ -303,6 +298,7 @@ function FeedbackPage() {
                       : undefined
                   }
                 />
+
               ))}
             </div>
           )}
