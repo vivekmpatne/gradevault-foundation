@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   GraduationCap,
@@ -9,9 +9,18 @@ import {
   Sparkles,
   BookOpen,
   IdCard,
+  LineChart as LineChartIcon,
+  Calculator as CalculatorIcon,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -20,6 +29,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "@/components/ui/chart";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  XAxis,
+  YAxis,
+} from "recharts";
 import {
   getCurrentStudent,
   computeCGPA,
@@ -33,6 +55,13 @@ import {
 export const Route = createFileRoute("/_app/dashboard")({
   component: DashboardPage,
 });
+
+const chartConfig = {
+  sgpa: {
+    label: "SGPA",
+    color: "hsl(var(--primary))",
+  },
+} satisfies ChartConfig;
 
 function DashboardPage() {
   const navigate = useNavigate();
@@ -49,6 +78,7 @@ function DashboardPage() {
 
   if (!student) return null;
 
+  const hasData = student.semesters.length > 0;
   const cgpa = computeCGPA(student.semesters);
   const sgpa = latestSGPA(student.semesters);
   const credits = totalCredits(student.semesters);
@@ -63,28 +93,37 @@ function DashboardPage() {
     low: "bg-destructive/15 text-destructive border-destructive/30",
   };
 
+  const sortedSemesters = [...student.semesters].sort(
+    (a, b) => a.number - b.number,
+  );
+
+  const chartData = sortedSemesters.map((s) => ({
+    semester: `Sem ${s.number}`,
+    sgpa: Number(s.sgpa.toFixed(2)),
+  }));
+
   const stats = [
     {
       label: "Current CGPA",
-      value: cgpa.toFixed(2),
+      value: hasData ? cgpa.toFixed(2) : "—",
       icon: TrendingUp,
       hint: "Cumulative across semesters",
     },
     {
       label: "Latest SGPA",
-      value: sgpa.toFixed(2),
+      value: hasData ? sgpa.toFixed(2) : "—",
       icon: Sparkles,
-      hint: `Semester ${student.semesters.length}`,
+      hint: hasData ? `Semester ${completed}` : "No data yet",
     },
     {
       label: "Credits Completed",
-      value: String(credits),
+      value: hasData ? String(credits) : "—",
       icon: Award,
       hint: "Total earned credits",
     },
     {
       label: "Equivalent %",
-      value: `${percentage.toFixed(2)}%`,
+      value: hasData ? `${percentage.toFixed(2)}%` : "—",
       icon: Percent,
       hint: "(CGPA − 0.75) × 10",
     },
@@ -96,22 +135,27 @@ function DashboardPage() {
     },
     {
       label: "Academic Status",
-      value: status.label,
+      value: hasData ? status.label : "—",
       icon: GraduationCap,
-      hint: `Based on ${cgpa.toFixed(2)} CGPA`,
-      tone: status.tone,
+      hint: hasData ? `Based on ${cgpa.toFixed(2)} CGPA` : "Awaiting data",
+      tone: hasData ? status.tone : undefined,
     },
   ] as const;
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">
+      {/* Header */}
+      <div className="flex flex-col gap-2">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
           Welcome, {student.profile.name.split(" ")[0]}
         </h1>
-        <p className="text-muted-foreground mt-1">
-          Here's a snapshot of your academic performance.
-        </p>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+          <span className="font-mono">{student.profile.usn}</span>
+          <span className="hidden sm:inline">•</span>
+          <span>{student.profile.branch}</span>
+          <span className="hidden sm:inline">•</span>
+          <span>Semester {student.profile.currentSemester}</span>
+        </div>
       </div>
 
       {/* Profile Card */}
@@ -138,69 +182,138 @@ function DashboardPage() {
               label="Semesters Completed"
               value={String(completed)}
             />
-            <ProfileField label="Current CGPA" value={cgpa.toFixed(2)} />
+            <ProfileField
+              label="Current CGPA"
+              value={hasData ? cgpa.toFixed(2) : "—"}
+            />
           </dl>
         </CardContent>
       </Card>
 
-      {/* Stat cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {stats.map((s) => (
-          <Card key={s.label}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {s.label}
-              </CardTitle>
-              <s.icon className="size-4 text-muted-foreground" />
+      {!hasData ? (
+        <Card>
+          <CardContent className="py-12 flex flex-col items-center text-center gap-4">
+            <div className="size-14 rounded-2xl bg-muted flex items-center justify-center">
+              <BookOpen className="size-7 text-muted-foreground" />
+            </div>
+            <div className="space-y-1">
+              <p className="font-medium">No academic records found.</p>
+              <p className="text-sm text-muted-foreground">
+                Add your semester data from the Calculator tab to see your
+                stats and trend.
+              </p>
+            </div>
+            <Button asChild>
+              <Link to="/calculator">
+                <CalculatorIcon className="size-4" />
+                Go to Calculator
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <>
+          {/* Stat cards */}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {stats.map((s) => (
+              <Card key={s.label}>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    {s.label}
+                  </CardTitle>
+                  <s.icon className="size-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  {"tone" in s && s.tone ? (
+                    <Badge
+                      variant="outline"
+                      className={statusToneClass[s.tone]}
+                    >
+                      {s.value}
+                    </Badge>
+                  ) : (
+                    <div className="text-2xl font-bold tracking-tight">
+                      {s.value}
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {s.hint}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* CGPA / SGPA Trend Chart */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <LineChartIcon className="size-4 text-muted-foreground" />
+                <CardTitle>SGPA Trend</CardTitle>
+              </div>
+              <CardDescription>
+                Semester-wise SGPA across completed terms.
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              {"tone" in s ? (
-                <Badge
-                  variant="outline"
-                  className={statusToneClass[s.tone]}
+              <ChartContainer
+                config={chartConfig}
+                className="h-[280px] w-full"
+              >
+                <LineChart
+                  data={chartData}
+                  margin={{ top: 8, right: 16, bottom: 8, left: 0 }}
                 >
-                  {s.value}
-                </Badge>
-              ) : (
-                <div className="text-2xl font-bold tracking-tight">
-                  {s.value}
-                </div>
-              )}
-              <p className="text-xs text-muted-foreground mt-1">{s.hint}</p>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis
+                    dataKey="semester"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                  />
+                  <YAxis
+                    domain={[0, 10]}
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    width={32}
+                  />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Line
+                    type="monotone"
+                    dataKey="sgpa"
+                    stroke="var(--color-sgpa)"
+                    strokeWidth={2}
+                    dot={{ r: 4 }}
+                    activeDot={{ r: 6 }}
+                  />
+                </LineChart>
+              </ChartContainer>
             </CardContent>
           </Card>
-        ))}
-      </div>
 
-      {/* Semester Overview */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <BookOpen className="size-4 text-muted-foreground" />
-            <CardTitle>Semester Overview</CardTitle>
-          </div>
-          <CardDescription>
-            All completed semesters with SGPA and credits earned.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {student.semesters.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              No completed semesters yet.
-            </p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Semester</TableHead>
-                  <TableHead>SGPA</TableHead>
-                  <TableHead className="text-right">Credits</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {[...student.semesters]
-                  .sort((a, b) => a.number - b.number)
-                  .map((sem) => (
+          {/* Semester Overview */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <BookOpen className="size-4 text-muted-foreground" />
+                <CardTitle>Semester Overview</CardTitle>
+              </div>
+              <CardDescription>
+                All completed semesters with SGPA and credits earned.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Semester</TableHead>
+                    <TableHead>SGPA</TableHead>
+                    <TableHead className="text-right">Credits</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {sortedSemesters.map((sem) => (
                     <TableRow key={sem.number}>
                       <TableCell className="font-medium">
                         Semester {sem.number}
@@ -211,11 +324,12 @@ function DashboardPage() {
                       </TableCell>
                     </TableRow>
                   ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </>
+      )}
     </div>
   );
 }
