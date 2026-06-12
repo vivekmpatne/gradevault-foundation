@@ -282,25 +282,40 @@ function DashboardPage() {
           </div>
 
           <Card>
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <LineChartIcon className="size-4 text-muted-foreground" />
-                <CardTitle>SGPA Trend</CardTitle>
+            <CardHeader className="flex flex-row items-start justify-between gap-3 space-y-0">
+              <div>
+                <div className="flex items-center gap-2">
+                  <LineChartIcon className="size-4 text-muted-foreground" />
+                  <CardTitle>SGPA Trend</CardTitle>
+                </div>
+                <CardDescription className="mt-1">
+                  Semester-wise SGPA across completed terms.
+                </CardDescription>
               </div>
-              <CardDescription>
-                Semester-wise SGPA across completed terms.
-              </CardDescription>
+              {completed.length >= 2 && (
+                <Badge
+                  variant="outline"
+                  className={`${trendMeta.cls} gap-1`}
+                >
+                  <trendMeta.Icon className="size-3.5" />
+                  {trendMeta.label}
+                </Badge>
+              )}
             </CardHeader>
             <CardContent>
               <ChartContainer
                 config={chartConfig}
-                className="h-[280px] w-full"
+                className="h-[300px] sm:h-[340px] w-full"
               >
                 <LineChart
                   data={chartData}
-                  margin={{ top: 8, right: 16, bottom: 8, left: 0 }}
+                  margin={{ top: 24, right: 24, bottom: 8, left: 0 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="hsl(var(--border))"
+                  />
                   <XAxis
                     dataKey="semester"
                     tickLine={false}
@@ -315,18 +330,72 @@ function DashboardPage() {
                     width={32}
                   />
                   <ChartTooltip content={<ChartTooltipContent />} />
+                  {/* Future projection — dashed grey line */}
+                  <Line
+                    type="monotone"
+                    dataKey="projected"
+                    stroke="hsl(var(--muted-foreground))"
+                    strokeWidth={2}
+                    strokeDasharray="6 6"
+                    dot={false}
+                    activeDot={false}
+                    connectNulls
+                    isAnimationActive
+                    animationDuration={900}
+                  />
+                  {/* Actual SGPA — colored dots per threshold */}
                   <Line
                     type="monotone"
                     dataKey="sgpa"
-                    stroke="var(--color-sgpa)"
-                    strokeWidth={2}
-                    dot={{ r: 4 }}
-                    activeDot={{ r: 6 }}
-                  />
+                    stroke="hsl(var(--primary))"
+                    strokeWidth={2.5}
+                    connectNulls
+                    isAnimationActive
+                    animationDuration={900}
+                    dot={(props) => {
+                      const { cx, cy, payload, index } = props;
+                      if (
+                        cx == null ||
+                        cy == null ||
+                        payload?.sgpa == null
+                      )
+                        return <g key={`d-${index}`} />;
+                      return (
+                        <circle
+                          key={`d-${index}`}
+                          cx={cx}
+                          cy={cy}
+                          r={5}
+                          fill={sgpaColor(payload.sgpa)}
+                          stroke="hsl(var(--background))"
+                          strokeWidth={2}
+                        />
+                      );
+                    }}
+                    activeDot={{ r: 7 }}
+                  >
+                    <LabelList
+                      dataKey="sgpa"
+                      position="top"
+                      offset={10}
+                      className="fill-foreground text-[11px] font-medium"
+                      formatter={(v: number | null) =>
+                        v == null ? "" : v.toFixed(2)
+                      }
+                    />
+                  </Line>
                 </LineChart>
               </ChartContainer>
+              <div className="mt-3 flex flex-wrap gap-3 text-xs text-muted-foreground">
+                <LegendDot color="#10B981" label="≥ 9.0" />
+                <LegendDot color="#2563EB" label="8.0 – 8.99" />
+                <LegendDot color="#F59E0B" label="7.0 – 7.99" />
+                <LegendDot color="#EF4444" label="< 7.0" />
+                <LegendDot color="hsl(var(--muted-foreground))" label="Projection" dashed />
+              </div>
             </CardContent>
           </Card>
+
 
           <Card>
             <CardHeader>
