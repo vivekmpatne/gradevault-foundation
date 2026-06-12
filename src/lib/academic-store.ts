@@ -135,7 +135,7 @@ export function computeAcademicData(): AcademicData {
   const completedSemesters = completedList.length;
   const latestSemesterNumber =
     semesters.length > 0 ? semesters[semesters.length - 1].number : 0;
-  const latest = semesters[semesters.length - 1];
+  
 
   // Current Semester = highest semester number present in history.
   // Falls back to 1 when there is no history yet.
