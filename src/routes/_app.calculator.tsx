@@ -67,20 +67,18 @@ const NEW_SEM = "new";
 
 function CalculatorPage() {
   const navigate = useNavigate();
-  const academic = useAcademicData();
-  const [student, setStudent] = useState<Student | null>(null);
+  const { academic } = useStudent();
+  const student = academic.student;
   const [saved, setSaved] = useState<Record<number, CalcSemester>>({});
   const [selected, setSelected] = useState<string>("1");
   const [subjects, setSubjects] = useState<CalcSubject[]>([newSubject()]);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
-    const s = getCurrentStudent();
-    if (!s) {
+    if (!student) {
       navigate({ to: "/" });
       return;
     }
-    setStudent(s);
     const all = loadAllSemesters();
     setSaved(all);
     // Honor an Edit hand-off from History; otherwise use the derived current sem.
@@ -93,8 +91,11 @@ function CalculatorPage() {
       }
     }
     setSelected(initial);
-    loadInto(initial, all, s);
-  }, [navigate]);
+    loadInto(initial, all, student);
+    // Intentionally only run on student identity change; academic.currentSemester
+    // is read once on mount as a seed.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [student?.profile.usn, navigate]);
 
   function loadInto(
     sel: string,
