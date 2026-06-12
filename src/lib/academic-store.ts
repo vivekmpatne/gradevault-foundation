@@ -20,11 +20,15 @@ export type AcademicSemester = {
   credits: number;
   subjects: CalcSubject[];
   source: "saved" | "seed";
+  completed: boolean;
 };
 
 export type AcademicData = {
   student: Student | null;
   semesters: AcademicSemester[];
+  completedSemesters: number;
+  currentSemester: number;
+  latestSemesterNumber: number;
   cgpa: number;
   latestSgpa: number;
   totalCredits: number;
@@ -32,6 +36,11 @@ export type AcademicData = {
   status: { label: string; tone: "excellent" | "good" | "average" | "low" };
   hasData: boolean;
 };
+
+function isSemesterCompleted(subjects: CalcSubject[]): boolean {
+  if (subjects.length === 0) return false;
+  return subjects.every((s) => (s.marks ?? 0) > 0 && (s.credits ?? 0) > 0);
+}
 
 function sgpaFromSubjects(subjects: CalcSubject[]): {
   sgpa: number;
@@ -76,6 +85,9 @@ export function computeAcademicData(): AcademicData {
     return {
       student: null,
       semesters: [],
+      completedSemesters: 0,
+      currentSemester: 1,
+      latestSemesterNumber: 0,
       cgpa: 0,
       latestSgpa: 0,
       totalCredits: 0,
@@ -102,11 +114,11 @@ export function computeAcademicData(): AcademicData {
           credits,
           subjects: s.subjects,
           source: "saved" as const,
+          completed: isSemesterCompleted(s.subjects),
         };
       }
       const subs = seedSubjects(student, num);
       const { sgpa, credits } = sgpaFromSubjects(subs);
-      // fall back to bundled sgpa/credits if marks weren't available
       const bundled = student.semesters.find((x) => x.number === num)!;
       return {
         number: num,
@@ -114,20 +126,44 @@ export function computeAcademicData(): AcademicData {
         credits: credits > 0 ? credits : bundled.credits,
         subjects: subs,
         source: "seed" as const,
+        // Seed data from the bundled JSON represents historical, finished terms.
+        completed: true,
       };
     });
 
-  const totalCredits = semesters.reduce((a, s) => a + s.credits, 0);
-  const weighted = semesters.reduce((a, s) => a + s.sgpa * s.credits, 0);
+  const completedList = semesters.filter((s) => s.completed);
+  const completedSemesters = completedList.length;
+  const latestSemesterNumber =
+    semesters.length > 0 ? semesters[semesters.length - 1].number : 0;
+  const latest = semesters[semesters.length - 1];
+
+  let currentSemester: number;
+  if (latest && !latest.completed) {
+    // Rule 3: in-progress latest semester IS the current semester.
+    currentSemester = latest.number;
+  } else {
+    // Rule 2: all completed → next semester.
+    currentSemester = Math.min(8, completedSemesters + 1);
+  }
+  // Rule 5: current can never be less than completed count.
+  if (currentSemester < completedSemesters) {
+    currentSemester = Math.min(8, completedSemesters);
+  }
+
+  const totalCredits = completedList.reduce((a, s) => a + s.credits, 0);
+  const weighted = completedList.reduce((a, s) => a + s.sgpa * s.credits, 0);
   const cgpa = totalCredits > 0 ? weighted / totalCredits : 0;
-  const latestSgpa =
-    semesters.length > 0 ? semesters[semesters.length - 1].sgpa : 0;
+  const latestCompleted = completedList[completedList.length - 1];
+  const latestSgpa = latestCompleted ? latestCompleted.sgpa : 0;
   const percentage = (cgpa - 0.75) * 10;
   const status = academicStatus(cgpa);
 
   return {
     student,
     semesters,
+    completedSemesters,
+    currentSemester,
+    latestSemesterNumber,
     cgpa,
     latestSgpa,
     totalCredits,
