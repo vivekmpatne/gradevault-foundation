@@ -21,6 +21,7 @@ import { Route as AppPlacementRouteImport } from './routes/_app.placement'
 import { Route as AppHistoryRouteImport } from './routes/_app.history'
 import { Route as AppFeedbackRouteImport } from './routes/_app.feedback'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppCodingHubRouteImport } from './routes/_app.coding-hub'
 import { Route as AppCalculatorRouteImport } from './routes/_app.calculator'
 
 const AppRoute = AppRouteImport.update({
@@ -82,6 +83,11 @@ const AppDashboardRoute = AppDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AppRoute,
 } as any)
+const AppCodingHubRoute = AppCodingHubRouteImport.update({
+  id: '/coding-hub',
+  path: '/coding-hub',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppCalculatorRoute = AppCalculatorRouteImport.update({
   id: '/calculator',
   path: '/calculator',
@@ -91,6 +97,7 @@ const AppCalculatorRoute = AppCalculatorRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/calculator': typeof AppCalculatorRoute
+  '/coding-hub': typeof AppCodingHubRoute
   '/dashboard': typeof AppDashboardRoute
   '/feedback': typeof AppFeedbackRoute
   '/history': typeof AppHistoryRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/calculator': typeof AppCalculatorRoute
+  '/coding-hub': typeof AppCodingHubRoute
   '/dashboard': typeof AppDashboardRoute
   '/feedback': typeof AppFeedbackRoute
   '/history': typeof AppHistoryRoute
@@ -121,6 +129,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/_app/calculator': typeof AppCalculatorRoute
+  '/_app/coding-hub': typeof AppCodingHubRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/feedback': typeof AppFeedbackRoute
   '/_app/history': typeof AppHistoryRoute
@@ -137,6 +146,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/calculator'
+    | '/coding-hub'
     | '/dashboard'
     | '/feedback'
     | '/history'
@@ -151,6 +161,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/calculator'
+    | '/coding-hub'
     | '/dashboard'
     | '/feedback'
     | '/history'
@@ -166,6 +177,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_app'
     | '/_app/calculator'
+    | '/_app/coding-hub'
     | '/_app/dashboard'
     | '/_app/feedback'
     | '/_app/history'
@@ -269,6 +281,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDashboardRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/coding-hub': {
+      id: '/_app/coding-hub'
+      path: '/coding-hub'
+      fullPath: '/coding-hub'
+      preLoaderRoute: typeof AppCodingHubRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/calculator': {
       id: '/_app/calculator'
       path: '/calculator'
@@ -281,6 +300,7 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppCalculatorRoute: typeof AppCalculatorRoute
+  AppCodingHubRoute: typeof AppCodingHubRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppFeedbackRoute: typeof AppFeedbackRoute
   AppHistoryRoute: typeof AppHistoryRoute
@@ -295,6 +315,7 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppCalculatorRoute: AppCalculatorRoute,
+  AppCodingHubRoute: AppCodingHubRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppFeedbackRoute: AppFeedbackRoute,
   AppHistoryRoute: AppHistoryRoute,
@@ -316,3 +337,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
